@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Emmanuel School Complex - Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#EC4899',
+                        accent: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444'
+                    },
+                    animation: {
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'gradient-x': 'gradientX 8s ease infinite'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        .report-card {
+            font-family: 'Times New Roman', serif;
+            background: white;
+            color: black;
+        }
+        .print-area {
+            background: white !important;
+            color: black !important;
+        }
+        
+        /* Custom animations */
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes gradientX {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Custom gradient backgrounds */
+        .gradient-rainbow {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientX 8s ease infinite;
+        }
+        
+        /* Enhanced hover effects */
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Card hover effects */
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        /* Button animations */
+        .btn-bounce:hover {
+            animation: bounce 0.6s;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+        
+        /* Pulse animation for important elements */
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.7); }
+            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.9), 0 0 30px rgba(99, 102, 241, 0.7); }
+            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.7); }
+        }
+        
+        /* Multi-select styling */
+        .subject-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .subject-checkbox:hover {
+            background: #e2e8f0;
+            border-color: #6366f1;
+        }
+        
+        .subject-checkbox.selected {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+        
+        @media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    
+    <!-- Home Screen -->
+    <div id="homeScreen" class="min-h-screen flex items-center justify-center gradient-rainbow">
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 hover-lift">
+            <div class="text-center mb-8 animate-bounce-in">
+                <i class="fas fa-graduation-cap text-6xl text-primary mb-4 pulse-glow"></i>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">PRINCE EMMANUEL</h1>
+                <h2 class="text-xl font-semibold text-gray-600 dark:text-gray-400">SCHOOL COMPLEX</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">Management System</p>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="showTeacherPortal()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transform transition-all duration-300 hover-lift btn-bounce shadow-lg">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i>Teacher Portal
+                </button>
+                <button onclick="showAdminPortal()" class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-4 rounded-xl font-semibold hover:from-primary/90 hover:to-secondary/90 transform transition-all duration-300 hover-lift btn-bounce shadow-lg">
+                    <i class="fas fa-cog mr-2"></i>Administrator Portal
+                </button>
+            </div>
+            
+            <div class="mt-8 text-center text-xs text-gray-500 animate-fade-in">
+                <p>© 2025 Prince Emmanuel School Complex</p>
+                <p class="mt-1 text-primary">Created by Joel Tozo</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Portal Login -->
+    <div id="teacherPortal" class="hidden min-h-screen flex items-center justify-center gradient-rainbow">
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 hover-lift">
+            <div class="text-center mb-6">
+                <i class="fas fa-chalkboard-teacher text-5xl text-blue-600 mb-4"></i>
+                <h2 class="text-2xl font-bold text-blue-600">Teacher Portal</h2>
+                <p class="text-gray-600">Login to Your Account</p>
+            </div>
+            
+            <div id="teacherLogin">
+                <form onsubmit="teacherLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Email Address</label>
+                        <input type="email" id="teacherEmail" required class="w-full px-3 py-3 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="teacherPassword" required class="w-full px-3 py-3 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300">
+                        Login
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-sm">
+                    Don't have an account? <a href="#" onclick="showTeacherSignup()" class="text-blue-600 hover:underline">Sign up here</a>
+                </p>
+            </div>
+
+            <div id="teacherSignup" class="hidden">
+                <form onsubmit="teacherSignup(event)">
+                    <h3 class="text-lg font-semibold mb-4">Create Teacher Account</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">First Name</label>
+                            <input type="text" id="teacherFirstName" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Last Name</label>
+                            <input type="text" id="teacherLastName" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Email Address</label>
+                        <input type="email" id="signupTeacherEmail" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Phone Number</label>
+                        <input type="tel" id="teacherPhone" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Subject Specialization</label>
+                        <div class="max-h-40 overflow-y-auto border-2 border-blue-300 rounded-xl p-2 bg-white">
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'English Language')">
+                                <input type="checkbox" class="mr-2"> English Language
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Mathematics')">
+                                <input type="checkbox" class="mr-2"> Mathematics
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Science')">
+                                <input type="checkbox" class="mr-2"> Science
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Social Studies')">
+                                <input type="checkbox" class="mr-2"> Social Studies
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Computing')">
+                                <input type="checkbox" class="mr-2"> Computing
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Career Technology')">
+                                <input type="checkbox" class="mr-2"> Career Technology
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative And Design')">
+                                <input type="checkbox" class="mr-2"> Creative And Design
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative Art')">
+                                <input type="checkbox" class="mr-2"> Creative Art
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Religious And Moral Edu.')">
+                                <input type="checkbox" class="mr-2"> Religious And Moral Edu.
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Fantse')">
+                                <input type="checkbox" class="mr-2"> Fantse
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Owop')">
+                                <input type="checkbox" class="mr-2"> Owop
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'History')">
+                                <input type="checkbox" class="mr-2"> History
+                            </div>
+                            <div class="subject-checkbox" onclick="toggleSubject(this, 'General Teacher')">
+                                <input type="checkbox" class="mr-2"> General Teacher
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="signupTeacherPassword" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Confirm Password</label>
+                            <input type="password" id="confirmTeacherPassword" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300">
+                        Create Account
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-sm">
+                    Already have an account? <a href="#" onclick="showTeacherLogin()" class="text-blue-600 hover:underline">Login here</a>
+                </p>
+            </div>
+            
+            <button onclick="goHome()" class="mt-4 text-blue-600 hover:underline text-sm">← Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Admin Portal Login -->
+    <div id="adminPortal" class="hidden min-h-screen flex items-center justify-center gradient-rainbow">
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 hover-lift">
+            <div class="text-center mb-6">
+                <i class="fas fa-shield-alt text-5xl text-primary mb-4"></i>
+                <h2 class="text-2xl font-bold text-primary">Administrator Login</h2>
+                <p class="text-gray-600">System Management Portal</p>
+            </div>
+            
+            <form onsubmit="adminLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Administrator Email</label>
+                    <input type="email" id="adminEmail" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Administrator Password</label>
+                    <input type="password" id="adminPassword" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold hover:from-primary/90 hover:to-secondary/90 transition-all duration-300">
+                    Admin Login
+                </button>
+            </form>
+            
+            <button onclick="goHome()" class="mt-4 text-primary hover:underline text-sm">← Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-2xl sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                        <div>
+                            <h1 class="text-lg font-bold">TEACHER PORTAL</h1>
+                            <p class="text-xs text-blue-200" id="teacherWelcome">Welcome, Teacher</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-sm transition-all duration-300">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-xl border-b border-blue-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-2 overflow-x-auto py-4">
+                    <button onclick="showTeacherSection('dashboard')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg">
+                        <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                    </button>
+                    <button onclick="showTeacherSection('students')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-users"></i><span>Students</span>
+                    </button>
+                    <button onclick="showTeacherSection('academics')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-book"></i><span>Academics</span>
+                    </button>
+                    <button onclick="showTeacherSection('reports')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-file-alt"></i><span>Reports</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Teacher Dashboard Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Section -->
+            <div id="teacher-dashboard" class="teacher-section">
+                <h2 class="text-3xl font-bold mb-8 text-blue-600">Teacher Dashboard</h2>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">My Students</h3>
+                                <p class="text-3xl font-bold" id="teacherStudentCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-line text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Avg Class Score</h3>
+                                <p class="text-3xl font-bold" id="teacherAvgScore">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-alt text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Reports Created</h3>
+                                <p class="text-3xl font-bold" id="teacherReportCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Last Activity</h3>
+                                <p class="text-2xl font-bold">Today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions and Info -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-xl font-semibold mb-4 text-blue-600">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="showTeacherSection('students'); showAddStudentModal()" class="w-full bg-blue-500 text-white px-4 py-3 rounded-xl hover:bg-blue-600 transition-all duration-300">
+                                <i class="fas fa-user-plus mr-2"></i>Add New Student
+                            </button>
+                            <button onclick="showTeacherSection('academics')" class="w-full bg-green-500 text-white px-4 py-3 rounded-xl hover:bg-green-600 transition-all duration-300">
+                                <i class="fas fa-plus mr-2"></i>Enter Scores
+                            </button>
+                            <button onclick="showTeacherSection('reports')" class="w-full bg-purple-500 text-white px-4 py-3 rounded-xl hover:bg-purple-600 transition-all duration-300">
+                                <i class="fas fa-file-alt mr-2"></i>Generate Reports
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-xl font-semibold mb-4 text-green-600">My Classes</h3>
+                        <div id="teacherClasses" class="text-sm">
+                            <p class="text-gray-500">No classes assigned</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-xl font-semibold mb-4 text-purple-600">Recent Activity</h3>
+                        <div id="teacherActivity" class="space-y-2 text-sm max-h-32 overflow-y-auto">
+                            <p class="text-gray-500">No recent activity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div id="teacher-students" class="teacher-section hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-blue-600">My Students</h2>
+                    <button onclick="showAddStudentModal()" class="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-all duration-300">
+                        <i class="fas fa-plus mr-2"></i>Add Student
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-blue-500 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left">Student ID</th>
+                                <th class="px-6 py-4 text-left">Name</th>
+                                <th class="px-6 py-4 text-left">Class</th>
+                                <th class="px-6 py-4 text-left">Gender</th>
+                                <th class="px-6 py-4 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherStudentsTable">
+                            <!-- Students will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Academics Section -->
+            <div id="teacher-academics" class="teacher-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-orange-600">Academic Management</h2>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-xl mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <select id="teacherScoreStudentSelect" class="px-4 py-3 text-base border-2 border-orange-300 rounded-xl bg-white focus:ring-4 focus:ring-orange-200 focus:border-orange-500">
+                            <option value="">Select Student</option>
+                        </select>
+                        <select id="teacherScoreTerm" class="px-4 py-3 text-base border-2 border-orange-300 rounded-xl bg-white focus:ring-4 focus:ring-orange-200 focus:border-orange-500">
+                            <option value="First Term">First Term</option>
+                            <option value="First Term(Mid-term)">First Term(Mid-term)</option>
+                            <option value="Second Term">Second Term</option>
+                            <option value="Second Term(Mid-term)">Second Term(Mid-term)</option>
+                            <option value="Third Term">Third Term</option>
+                            <option value="Third Term(Mid-term)">Third Term(Mid-term)</option>
+                        </select>
+                        <input type="number" id="teacherScoreYear" value="2025" class="px-4 py-3 text-base border-2 border-orange-300 rounded-xl bg-white focus:ring-4 focus:ring-orange-200 focus:border-orange-500">
+                        <button onclick="loadTeacherScoreForm()" class="bg-orange-500 text-white px-4 py-3 rounded-xl hover:bg-orange-600 transition-all duration-300">
+                            Load Student
+                        </button>
+                    </div>
+                    
+                    <div id="teacherScoreEntryForm" class="hidden">
+                        <h3 class="text-xl font-semibold mb-4 text-orange-600">Enter Scores</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border-2 border-orange-300 rounded-xl overflow-hidden">
+                                <thead>
+                                    <tr class="bg-orange-500 text-white">
+                                        <th class="border border-orange-300 px-4 py-3 text-left font-bold">Subject</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">SBA (30%)</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">Exam (70%)</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">Total (100%)</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">Grade</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">Position</th>
+                                        <th class="border border-orange-300 px-4 py-3 text-center font-bold">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teacherScoresTableBody" class="bg-white">
+                                    <!-- Scores will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end space-x-4">
+                            <button onclick="clearTeacherScores()" class="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-300">
+                                Clear
+                            </button>
+                            <button onclick="saveTeacherScores()" class="px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-300">
+                                Save Scores
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="teacher-reports" class="teacher-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-purple-600">Report Generation</h2>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-xl mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <select id="teacherReportStudentSelect" class="px-4 py-3 text-base border-2 border-purple-300 rounded-xl bg-white focus:ring-4 focus:ring-purple-200 focus:border-purple-500">
+                            <option value="">Select Student</option>
+                        </select>
+                        <select id="teacherReportTerm" class="px-4 py-3 text-base border-2 border-purple-300 rounded-xl bg-white focus:ring-4 focus:ring-purple-200 focus:border-purple-500">
+                            <option value="First Term">First Term</option>
+                            <option value="First Term(Mid-term)">First Term(Mid-term)</option>
+                            <option value="Second Term">Second Term</option>
+                            <option value="Second Term(Mid-term)">Second Term(Mid-term)</option>
+                            <option value="Third Term">Third Term</option>
+                            <option value="Third Term(Mid-term)">Third Term(Mid-term)</option>
+                        </select>
+                        <input type="number" id="teacherReportYear" value="2025" class="px-4 py-3 text-base border-2 border-purple-300 rounded-xl bg-white focus:ring-4 focus:ring-purple-200 focus:border-purple-500">
+                        <button onclick="generateTeacherReport()" class="bg-purple-500 text-white px-4 py-3 rounded-xl hover:bg-purple-600 transition-all duration-300">
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+
+                <div id="teacherReportCard" class="print-area hidden bg-white text-black shadow-2xl rounded-2xl">
+                    <!-- Report card will be generated here -->
+                </div>
+                
+                <!-- Report Action Navigation Bar -->
+                <div id="teacherReportActionsNav" class="hidden mt-6 no-print">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-lg font-semibold mb-4 text-center text-purple-600">Share Report Card</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button onclick="printTeacherReport()" class="bg-green-500 text-white px-4 py-3 rounded-xl hover:bg-green-600 transition-all duration-300 flex items-center justify-center">
+                                <i class="fas fa-print mr-2"></i>Print Report
+                            </button>
+                            <button onclick="downloadTeacherReportPDF()" class="bg-red-500 text-white px-4 py-3 rounded-xl hover:bg-red-600 transition-all duration-300 flex items-center justify-center">
+                                <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                            </button>
+                            <button onclick="shareTeacherReportToParent()" class="bg-green-600 text-white px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 flex items-center justify-center">
+                                <i class="fab fa-whatsapp mr-2"></i>Send to Parent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-primary via-purple-600 to-secondary text-white shadow-2xl sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-shield-alt text-3xl"></i>
+                        <div>
+                            <h1 class="text-lg font-bold">ADMIN DASHBOARD</h1>
+                            <p class="text-xs text-blue-200">System Management Portal</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Administrator</span>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-sm transition-all duration-300">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-xl border-b border-primary/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-2 overflow-x-auto py-4">
+                    <button onclick="showAdminSection('dashboard')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg">
+                        <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                    </button>
+                    <button onclick="showAdminSection('teachers')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-chalkboard-teacher"></i><span>Teachers</span>
+                    </button>
+                    <button onclick="showAdminSection('students')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-users"></i><span>Students</span>
+                    </button>
+                    <button onclick="showAdminSection('activities')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-chart-bar"></i><span>Activities</span>
+                    </button>
+                    <button onclick="showAdminSection('reports')" class="nav-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-blue-100 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-file-alt"></i><span>Reports</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Admin Dashboard Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Section -->
+            <div id="admin-dashboard" class="admin-section">
+                <h2 class="text-3xl font-bold mb-8 text-primary">System Overview</h2>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-chalkboard-teacher text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Total Teachers</h3>
+                                <p class="text-3xl font-bold" id="adminTeacherCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Total Students</h3>
+                                <p class="text-3xl font-bold" id="adminStudentCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-alt text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Total Reports</h3>
+                                <p class="text-3xl font-bold" id="adminReportCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-700 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-4xl mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-semibold">Active Today</h3>
+                                <p class="text-3xl font-bold" id="adminActiveCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities and System Status -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-xl font-semibold mb-4 text-primary">Recent Teacher Activities</h3>
+                        <div id="adminRecentActivities" class="space-y-2 text-sm max-h-64 overflow-y-auto">
+                            <p class="text-gray-500">No recent activities</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-xl font-semibold mb-4 text-green-600">System Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span>Database Status:</span>
+                                <span class="text-green-600 font-semibold">Online</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Active Sessions:</span>
+                                <span class="text-blue-600 font-semibold" id="activeSessions">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Data Backup:</span>
+                                <span class="text-green-600 font-semibold">Current</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teachers Section -->
+            <div id="admin-teachers" class="admin-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-blue-600">Teacher Management</h2>
+                
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-blue-500 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left">Name</th>
+                                <th class="px-6 py-4 text-left">Email</th>
+                                <th class="px-6 py-4 text-left">Subject</th>
+                                <th class="px-6 py-4 text-left">Students Added</th>
+                                <th class="px-6 py-4 text-left">Reports Created</th>
+                                <th class="px-6 py-4 text-left">Last Active</th>
+                                <th class="px-6 py-4 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTeachersTable">
+                            <!-- Teachers will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div id="admin-students" class="admin-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-green-600">Student Overview</h2>
+                
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-green-500 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left">Student ID</th>
+                                <th class="px-6 py-4 text-left">Name</th>
+                                <th class="px-6 py-4 text-left">Class</th>
+                                <th class="px-6 py-4 text-left">Added By</th>
+                                <th class="px-6 py-4 text-left">Date Added</th>
+                                <th class="px-6 py-4 text-left">Reports</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminStudentsTable">
+                            <!-- Students will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Activities Section -->
+            <div id="admin-activities" class="admin-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-orange-600">System Activities</h2>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4">All Activities</h3>
+                    <div id="adminActivitiesLog" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-500">No activities recorded</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-white p-6 rounded-2xl shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4">Activity Summary</h3>
+                    <div id="adminActivitySummary" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Summary will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="admin-reports" class="admin-section hidden">
+                <h2 class="text-3xl font-bold mb-8 text-purple-600">System Reports</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl text-center">
+                        <h3 class="text-lg font-semibold mb-4">Export Data</h3>
+                        <div class="space-y-3">
+                            <button onclick="exportTeachersData()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-all duration-300">
+                                Export Teachers Data
+                            </button>
+                            <button onclick="exportAllStudentsData()" class="w-full bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition-all duration-300">
+                                Export All Students Data
+                            </button>
+                            <button onclick="exportActivitiesLog()" class="w-full bg-purple-500 text-white px-4 py-2 rounded-xl hover:bg-purple-600 transition-all duration-300">
+                                Export Activities Log
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-lg font-semibold mb-4 text-center">System Analytics</h3>
+                        <div id="systemAnalytics" class="space-y-3">
+                            <!-- Analytics will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white backdrop-blur-lg rounded-2xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto animate-bounce-in">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-primary">Add New Student</h3>
+                        <button onclick="hideAddStudentModal()" class="text-gray-400 hover:text-red-500 transition-colors duration-300">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form onsubmit="addStudent(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Student ID</label>
+                                <input type="text" id="studentId" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Full Name</label>
+                                <input type="text" id="studentName" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Class</label>
+                                <select id="studentClass" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="">Select Class</option>
+                                    <option value="Nursery 1">Nursery 1</option>
+                                    <option value="Nursery 2">Nursery 2</option>
+                                    <option value="KG1">KG1</option>
+                                    <option value="KG2">KG2</option>
+                                    <option value="Basic One">Basic One</option>
+                                    <option value="Basic Two">Basic Two</option>
+                                    <option value="Basic Three">Basic Three</option>
+                                    <option value="Basic Four">Basic Four</option>
+                                    <option value="Basic Five">Basic Five</option>
+                                    <option value="Basic Six">Basic Six</option>
+                                    <option value="Basic Seven">Basic Seven</option>
+                                    <option value="Basic Eight">Basic Eight</option>
+                                    <option value="Basic Nine">Basic Nine</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Gender</label>
+                                <select id="studentGender" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Date of Birth</label>
+                                <input type="date" id="studentDob" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Parent/Guardian Name</label>
+                                <input type="text" id="parentName" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Phone Number</label>
+                                <input type="tel" id="parentPhone" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Talents & Interest</label>
+                                <select id="studentTalent" class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="Music and Dance">Music and Dance</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Creative">Creative</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-2">Address</label>
+                                <textarea id="studentAddress" rows="3" class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-end space-x-4">
+                            <button type="button" onclick="hideAddStudentModal()" class="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-300">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 shadow-lg">
+                                Add Student
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, where, orderBy, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzMkXAZgmPcKO-dmORZ3CnWsgvnqdT8B8",
+            authDomain: "pesco-2a310.firebaseapp.com",
+            projectId: "pesco-2a310",
+            storageBucket: "pesco-2a310.firebasestorage.app",
+            messagingSenderId: "555392325139",
+            appId: "1:555392325139:web:a0ab96f75741fce118d1e6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.auth = auth;
+        window.db = db;
+        window.firebaseAuth = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+        window.firestore = { collection, addDoc, getDocs, doc, setDoc, getDoc, query, where, orderBy, updateDoc, deleteDoc, serverTimestamp };
+    </script>
+
+    <script>
+        // Dark mode handling
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Global variables
+        let currentUser = null;
+        let currentUserRole = null;
+        let selectedSubjects = [];
+
+        // Subjects for different class levels
+        const subjectsBasic16 = [
+            'English Language',
+            'Mathematics',
+            'Science',
+            'Owop',
+            'Computing',
+            'History',
+            'Creative And Design',
+            'Religious And Moral Edu.',
+            'Fantse'
+        ];
+
+        const subjectsBasic79 = [
+            'English Language',
+            'Mathematics',
+            'Science',
+            'Social Studies',
+            'Computing',
+            'Career Technology',
+            'Creative And Design',
+            'Religious And Moral Edu.',
+            'Fantse'
+        ];
+
+        // All available classes
+        const allClasses = [
+            'Nursery 1', 'Nursery 2', 'KG1', 'KG2', 
+            'Basic One', 'Basic Two', 'Basic Three', 'Basic Four', 
+            'Basic Five', 'Basic Six', 'Basic Seven', 'Basic Eight', 'Basic Nine'
+        ];
+
+        // Grade calculation
+        function calculateGrade(total) {
+            if (total >= 90) return { grade: 1, remark: 'HIGHEST' };
+            if (total >= 80) return { grade: 2, remark: 'HIGHER' };
+            if (total >= 70) return { grade: 3, remark: 'HIGH' };
+            if (total >= 60) return { grade: 4, remark: 'HIGH AVERAGE' };
+            if (total >= 55) return { grade: 5, remark: 'AVERAGE' };
+            if (total >= 50) return { grade: 6, remark: 'LOW AVERAGE' };
+            if (total >= 40) return { grade: 7, remark: 'LOW' };
+            if (total >= 35) return { grade: 8, remark: 'LOWER' };
+            return { grade: 9, remark: 'LOWEST' };
+        }
+
+        // Check if class uses Basic 1-6 subjects
+        function isBasic16Class(className) {
+            const basic16Classes = ['Basic One', 'Basic Two', 'Basic Three', 'Basic Four', 'Basic Five', 'Basic Six'];
+            return basic16Classes.includes(className);
+        }
+
+        // Get subjects based on class
+        function getSubjectsForClass(className) {
+            return isBasic16Class(className) ? subjectsBasic16 : subjectsBasic79;
+        }
+
+        // Authentication state observer
+        window.auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                checkUserRole();
+            } else {
+                currentUser = null;
+                currentUserRole = null;
+            }
+        });
+
+        // Check user role in Firestore
+        async function checkUserRole() {
+            if (!currentUser) return;
+
+            try {
+                // Check if user is a teacher
+                const teacherDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid));
+                if (teacherDoc.exists()) {
+                    currentUserRole = 'teacher';
+                    const teacherData = teacherDoc.data();
+                    document.getElementById('teacherWelcome').textContent = `Welcome, ${teacherData.firstName} ${teacherData.lastName}`;
+                    showTeacherDashboard();
+                    loadTeacherData();
+                    return;
+                }
+
+                // Check if user is admin (you can set this up in Firestore manually or create an admin registration)
+                const adminDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'admins', currentUser.uid));
+                if (adminDoc.exists()) {
+                    currentUserRole = 'admin';
+                    showAdminDashboard();
+                    loadAdminData();
+                    return;
+                }
+
+                // If neither, sign out
+                await window.auth.signOut();
+                showAlert('User role not found. Please contact administrator.');
+            } catch (error) {
+                console.error('Error checking user role:', error);
+                showAlert('Error checking user permissions.');
+            }
+        }
+
+        // Navigation functions
+        function goHome() {
+            document.getElementById('homeScreen').classList.remove('hidden');
+            document.getElementById('teacherPortal').classList.add('hidden');
+            document.getElementById('adminPortal').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+        }
+
+        function showTeacherPortal() {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('teacherPortal').classList.remove('hidden');
+        }
+
+        function showAdminPortal() {
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('adminPortal').classList.remove('hidden');
+        }
+
+        function showTeacherLogin() {
+            document.getElementById('teacherLogin').classList.remove('hidden');
+            document.getElementById('teacherSignup').classList.add('hidden');
+        }
+
+        function showTeacherSignup() {
+            document.getElementById('teacherLogin').classList.add('hidden');
+            document.getElementById('teacherSignup').classList.remove('hidden');
+        }
+
+        function showTeacherDashboard() {
+            document.getElementById('teacherPortal').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.remove('hidden');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminPortal').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+        }
+
+        // Subject selection for teacher registration
+        function toggleSubject(element, subject) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+                if (!selectedSubjects.includes(subject)) {
+                    selectedSubjects.push(subject);
+                }
+            } else {
+                element.classList.remove('selected');
+                selectedSubjects = selectedSubjects.filter(s => s !== subject);
+            }
+        }
+
+        // Authentication functions
+        async function teacherSignup(event) {
+            event.preventDefault();
+            
+            const firstName = document.getElementById('teacherFirstName').value;
+            const lastName = document.getElementById('teacherLastName').value;
+            const email = document.getElementById('signupTeacherEmail').value;
+            const phone = document.getElementById('teacherPhone').value;
+            const password = document.getElementById('signupTeacherPassword').value;
+            const confirmPassword = document.getElementById('confirmTeacherPassword').value;
+
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match!');
+                return;
+            }
+
+            if (selectedSubjects.length === 0) {
+                showAlert('Please select at least one subject specialization.');
+                return;
+            }
+
+            try {
+                // Create user account
+                const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(window.auth, email, password);
+                const user = userCredential.user;
+
+                // Save teacher data to Firestore
+                await window.firestore.setDoc(window.firestore.doc(window.db, 'teachers', user.uid), {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    subjects: selectedSubjects,
+                    createdAt: window.firestore.serverTimestamp(),
+                    studentsAdded: 0,
+                    reportsCreated: 0,
+                    lastActive: window.firestore.serverTimestamp()
+                });
+
+                // Log activity
+                await logActivity(`New teacher registered: ${firstName} ${lastName}`, 'teacher_registration');
+
+                showAlert('Teacher account created successfully!');
+                selectedSubjects = []; // Reset selected subjects
+                document.querySelector('#teacherSignup form').reset();
+                
+                // Reset checkboxes
+                document.querySelectorAll('.subject-checkbox').forEach(cb => {
+                    cb.classList.remove('selected');
+                    cb.querySelector('input').checked = false;
+                });
+
+            } catch (error) {
+                console.error('Error creating teacher account:', error);
+                showAlert(error.message);
+            }
+        }
+
+        async function teacherLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('teacherEmail').value;
+            const password = document.getElementById('teacherPassword').value;
+
+            try {
+                const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(window.auth, email, password);
+                // The auth state observer will handle the rest
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showAlert(error.message);
+            }
+        }
+
+        async function adminLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(window.auth, email, password);
+                // The auth state observer will handle the rest
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showAlert(error.message);
+            }
+        }
+
+        async function logout() {
+            try {
+                await window.auth.signOut();
+                goHome();
+            } catch (error) {
+                console.error('Error signing out:', error);
+                showAlert('Error signing out.');
+            }
+        }
+
+        // Section navigation
+        function showTeacherSection(section) {
+            document.querySelectorAll('.teacher-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`teacher-${section}`).classList.remove('hidden');
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('from-blue-500', 'to-blue-600');
+                btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-blue-100');
+            });
+            event.target.closest('button').classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-blue-100');
+            event.target.closest('button').classList.add('bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
+
+            if (section === 'students') loadTeacherStudents();
+            if (section === 'academics') loadTeacherAcademics();
+            if (section === 'reports') loadTeacherReports();
+        }
+
+        function showAdminSection(section) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`admin-${section}`).classList.remove('hidden');
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('from-primary', 'to-purple-600');
+                btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-blue-100');
+            });
+            event.target.closest('button').classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-blue-100');
+            event.target.closest('button').classList.add('bg-gradient-to-r', 'from-primary', 'to-purple-600', 'text-white');
+
+            if (section === 'teachers') loadAdminTeachers();
+            if (section === 'students') loadAdminStudents();
+            if (section === 'activities') loadAdminActivities();
+            if (section === 'reports') loadAdminReports();
+        }
+
+        // Student Management
+        async function addStudent(event) {
+            event.preventDefault();
+            
+            if (!currentUser || currentUserRole !== 'teacher') {
+                showAlert('Only teachers can add students.');
+                return;
+            }
+
+            const studentData = {
+                id: document.getElementById('studentId').value,
+                name: document.getElementById('studentName').value,
+                class: document.getElementById('studentClass').value,
+                gender: document.getElementById('studentGender').value,
+                dob: document.getElementById('studentDob').value,
+                parentName: document.getElementById('parentName').value,
+                parentPhone: document.getElementById('parentPhone').value,
+                talent: document.getElementById('studentTalent').value,
+                address: document.getElementById('studentAddress').value,
+                teacherId: currentUser.uid,
+                createdAt: window.firestore.serverTimestamp()
+            };
+
+            try {
+                // Check if student ID already exists
+                const studentsQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'students'),
+                    window.firestore.where('id', '==', studentData.id)
+                );
+                const existingStudents = await window.firestore.getDocs(studentsQuery);
+                
+                if (!existingStudents.empty) {
+                    showAlert('Student ID already exists!');
+                    return;
+                }
+
+                // Add student to Firestore
+                await window.firestore.addDoc(window.firestore.collection(window.db, 'students'), studentData);
+
+                // Update teacher's student count
+                const teacherRef = window.firestore.doc(window.db, 'teachers', currentUser.uid);
+                const teacherDoc = await window.firestore.getDoc(teacherRef);
+                if (teacherDoc.exists()) {
+                    const currentCount = teacherDoc.data().studentsAdded || 0;
+                    await window.firestore.updateDoc(teacherRef, {
+                        studentsAdded: currentCount + 1,
+                        lastActive: window.firestore.serverTimestamp()
+                    });
+                }
+
+                // Log activity
+                await logActivity(`Added new student: ${studentData.name} (${studentData.id})`, 'student_added');
+
+                hideAddStudentModal();
+                showAlert('Student added successfully!');
+                loadTeacherStudents();
+                loadTeacherData();
+                
+                // Reset form
+                document.querySelector('#addStudentModal form').reset();
+                generateStudentId();
+
+            } catch (error) {
+                console.error('Error adding student:', error);
+                showAlert('Error adding student.');
+            }
+        }
+
+        // Generate student ID
+        function generateStudentId() {
+            const currentYear = new Date().getFullYear();
+            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            document.getElementById('studentId').value = `PESC${currentYear}${randomNum}`;
+        }
+
+        function showAddStudentModal() {
+            generateStudentId();
+            document.getElementById('addStudentModal').classList.remove('hidden');
+        }
+
+        function hideAddStudentModal() {
+            document.getElementById('addStudentModal').classList.add('hidden');
+        }
+
+        // Load teacher data
+        async function loadTeacherData() {
+            if (!currentUser || currentUserRole !== 'teacher') return;
+
+            try {
+                // Load students count
+                const studentsQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'students'),
+                    window.firestore.where('teacherId', '==', currentUser.uid)
+                );
+                const studentsSnapshot = await window.firestore.getDocs(studentsQuery);
+                document.getElementById('teacherStudentCount').textContent = studentsSnapshot.size;
+
+                // Load teacher data
+                const teacherDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid));
+                if (teacherDoc.exists()) {
+                    const teacherData = teacherDoc.data();
+                    document.getElementById('teacherReportCount').textContent = teacherData.reportsCreated || 0;
+                }
+
+            } catch (error) {
+                console.error('Error loading teacher data:', error);
+            }
+        }
+
+        // Load teacher students
+        async function loadTeacherStudents() {
+            if (!currentUser || currentUserRole !== 'teacher') return;
+
+            try {
+                const studentsQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'students'),
+                    window.firestore.where('teacherId', '==', currentUser.uid),
+                    window.firestore.orderBy('createdAt', 'desc')
+                );
+                const studentsSnapshot = await window.firestore.getDocs(studentsQuery);
+                
+                const tbody = document.getElementById('teacherStudentsTable');
+                tbody.innerHTML = '';
+
+                if (studentsSnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No students found. Click "Add Student" to get started.</td></tr>';
+                    return;
+                }
+
+                studentsSnapshot.forEach((doc, index) => {
+                    const student = doc.data();
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-semibold text-blue-600">${student.id}</td>
+                        <td class="px-6 py-4 font-medium">${student.name}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                ${student.class}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${student.gender === 'Male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">
+                                ${student.gender}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="deleteStudent('${doc.id}')" class="text-red-600 hover:text-red-800 p-2 rounded-xl hover:bg-red-100 transition-all duration-300" title="Delete Student">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Load students into dropdowns
+                loadStudentsIntoDropdowns(studentsSnapshot);
+
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Load students into dropdowns
+        function loadStudentsIntoDropdowns(studentsSnapshot) {
+            const selects = [
+                document.getElementById('teacherScoreStudentSelect'),
+                document.getElementById('teacherReportStudentSelect')
+            ];
+
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Select Student</option>';
+                studentsSnapshot.forEach(doc => {
+                    const student = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = `${student.name} - ${student.class} (${student.id})`;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Load teacher academics
+        async function loadTeacherAcademics() {
+            if (!currentUser || currentUserRole !== 'teacher') return;
+            // This will be populated when a student is selected
+        }
+
+        // Load teacher reports
+        async function loadTeacherReports() {
+            if (!currentUser || currentUserRole !== 'teacher') return;
+            // This will be populated when a student is selected
+        }
+
+        // Score management
+        async function loadTeacherScoreForm() {
+            const studentDocId = document.getElementById('teacherScoreStudentSelect').value;
+            const term = document.getElementById('teacherScoreTerm').value;
+            const year = document.getElementById('teacherScoreYear').value;
+            
+            if (!studentDocId) {
+                showAlert('Please select a student');
+                return;
+            }
+
+            try {
+                // Get student data
+                const studentDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'students', studentDocId));
+                if (!studentDoc.exists()) {
+                    showAlert('Student not found');
+                    return;
+                }
+
+                const studentData = studentDoc.data();
+                const subjects = getSubjectsForClass(studentData.class);
+                
+                const form = document.getElementById('teacherScoreEntryForm');
+                form.classList.remove('hidden');
+                
+                const tbody = document.getElementById('teacherScoresTableBody');
+                tbody.innerHTML = '';
+
+                // Load existing scores
+                const scoresDocId = `${studentDocId}_${term}_${year}`;
+                const scoresDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'scores', scoresDocId));
+                const existingScores = scoresDoc.exists() ? scoresDoc.data().subjects || {} : {};
+
+                subjects.forEach((subject, index) => {
+                    const subjectScore = existingScores[subject] || { sba: '', exam: '' };
+                    const total = subjectScore.sba && subjectScore.exam ? 
+                        Math.round(parseFloat(subjectScore.sba) + parseFloat(subjectScore.exam)) : '';
+                    const gradeInfo = total ? calculateGrade(total) : { grade: '', remark: '' };
+                    
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white hover:bg-orange-50' : 'bg-orange-50 hover:bg-orange-100';
+                    
+                    row.innerHTML = `
+                        <td class="border border-orange-300 px-4 py-3 font-semibold text-orange-700">${subject}</td>
+                        <td class="border border-orange-300 px-4 py-3">
+                            <input type="number" min="0" max="30" step="0.1" 
+                                   data-subject="${subject}" data-type="sba" 
+                                   value="${subjectScore.sba}"
+                                   class="w-full px-2 py-2 text-center text-base border-2 border-orange-200 rounded-lg focus:ring-4 focus:ring-orange-100 focus:border-orange-400 bg-white transition-all duration-300"
+                                   onchange="updateTeacherScore(this)">
+                        </td>
+                        <td class="border border-orange-300 px-4 py-3">
+                            <input type="number" min="0" max="70" step="0.1" 
+                                   data-subject="${subject}" data-type="exam" 
+                                   value="${subjectScore.exam}"
+                                   class="w-full px-2 py-2 text-center text-base border-2 border-orange-200 rounded-lg focus:ring-4 focus:ring-orange-100 focus:border-orange-400 bg-white transition-all duration-300"
+                                   onchange="updateTeacherScore(this)">
+                        </td>
+                        <td class="border border-orange-300 px-4 py-3 text-center font-bold text-xl ${total >= 70 ? 'text-green-600' : total >= 50 ? 'text-yellow-600' : 'text-red-600'}" data-total="${subject}">${total}</td>
+                        <td class="border border-orange-300 px-4 py-3 text-center font-bold text-lg" data-grade="${subject}">${gradeInfo.grade}</td>
+                        <td class="border border-orange-300 px-4 py-3 text-center font-bold text-lg text-primary" data-position="${subject}">-</td>
+                        <td class="border border-orange-300 px-4 py-3 text-center font-semibold text-sm" data-remark="${subject}">${gradeInfo.remark}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Calculate positions
+                await calculateTeacherPositions(studentData.class, term, year);
+
+            } catch (error) {
+                console.error('Error loading score form:', error);
+                showAlert('Error loading score form.');
+            }
+        }
+
+        function updateTeacherScore(input) {
+            const subject = input.dataset.subject;
+            const type = input.dataset.type;
+            const value = parseFloat(input.value) || 0;
+            
+            // Validate ranges
+            if (type === 'sba' && value > 30) {
+                input.value = 30;
+                return;
+            }
+            if (type === 'exam' && value > 70) {
+                input.value = 70;
+                return;
+            }
+            
+            const row = input.closest('tr');
+            const sbaInput = row.querySelector('[data-type="sba"]');
+            const examInput = row.querySelector('[data-type="exam"]');
+            
+            const sba = parseFloat(sbaInput.value) || 0;
+            const exam = parseFloat(examInput.value) || 0;
+            const total = sba + exam;
+            
+            const totalCell = row.querySelector(`[data-total="${subject}"]`);
+            const gradeCell = row.querySelector(`[data-grade="${subject}"]`);
+            const remarkCell = row.querySelector(`[data-remark="${subject}"]`);
+            
+            totalCell.textContent = total > 0 ? Math.round(total) : '';
+            
+            // Update total cell color based on score
+            totalCell.className = `border border-orange-300 px-4 py-3 text-center font-bold text-xl ${total >= 70 ? 'text-green-600' : total >= 50 ? 'text-yellow-600' : 'text-red-600'}`;
+            
+            if (total > 0) {
+                const gradeInfo = calculateGrade(total);
+                gradeCell.textContent = gradeInfo.grade;
+                remarkCell.textContent = gradeInfo.remark;
+            } else {
+                gradeCell.textContent = '';
+                remarkCell.textContent = '';
+            }
+        }
+
+        async function calculateTeacherPositions(className, term, year) {
+            try {
+                // Get all students in the same class
+                const studentsQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'students'),
+                    window.firestore.where('class', '==', className)
+                );
+                const studentsSnapshot = await window.firestore.getDocs(studentsQuery);
+                
+                const subjects = getSubjectsForClass(className);
+                
+                for (const subject of subjects) {
+                    const subjectScores = [];
+                    
+                    for (const studentDoc of studentsSnapshot.docs) {
+                        const scoresDocId = `${studentDoc.id}_${term}_${year}`;
+                        const scoresDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'scores', scoresDocId));
+                        
+                        if (scoresDoc.exists()) {
+                            const scoresData = scoresDoc.data().subjects || {};
+                            const subjectScore = scoresData[subject] || { sba: 0, exam: 0 };
+                            const total = parseFloat(subjectScore.sba) + parseFloat(subjectScore.exam);
+                            
+                            if (total > 0) {
+                                subjectScores.push({ studentId: studentDoc.id, total });
+                            }
+                        }
+                    }
+                    
+                    // Sort by total score (descending)
+                    subjectScores.sort((a, b) => b.total - a.total);
+                    
+                    // Update position in UI if current student is loaded
+                    const currentStudentId = document.getElementById('teacherScoreStudentSelect').value;
+                    const position = subjectScores.findIndex(s => s.studentId === currentStudentId) + 1;
+                    const positionCell = document.querySelector(`[data-position="${subject}"]`);
+                    
+                    if (positionCell && position > 0) {
+                        positionCell.textContent = position;
+                    }
+                }
+            } catch (error) {
+                console.error('Error calculating positions:', error);
+            }
+        }
+
+        async function saveTeacherScores() {
+            const studentDocId = document.getElementById('teacherScoreStudentSelect').value;
+            const term = document.getElementById('teacherScoreTerm').value;
+            const year = document.getElementById('teacherScoreYear').value;
+            
+            if (!studentDocId) {
+                showAlert('Please select a student');
+                return;
+            }
+
+            try {
+                // Get student data
+                const studentDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'students', studentDocId));
+                const studentData = studentDoc.data();
+                const subjects = getSubjectsForClass(studentData.class);
+                
+                const scoresData = {};
+                
+                subjects.forEach(subject => {
+                    const row = document.querySelector(`[data-subject="${subject}"]`).closest('tr');
+                    const sba = parseFloat(row.querySelector('[data-type="sba"]').value) || 0;
+                    const exam = parseFloat(row.querySelector('[data-type="exam"]').value) || 0;
+                    
+                    scoresData[subject] = { sba, exam };
+                });
+                
+                const scoresDocId = `${studentDocId}_${term}_${year}`;
+                await window.firestore.setDoc(window.firestore.doc(window.db, 'scores', scoresDocId), {
+                    studentId: studentDocId,
+                    term: term,
+                    year: year,
+                    subjects: scoresData,
+                    teacherId: currentUser.uid,
+                    updatedAt: window.firestore.serverTimestamp()
+                });
+
+                // Update teacher's last active
+                await window.firestore.updateDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid), {
+                    lastActive: window.firestore.serverTimestamp()
+                });
+
+                // Log activity
+                await logActivity(`Updated scores for ${studentData.name} - ${term} ${year}`, 'scores_updated');
+
+                showAlert('Scores saved successfully!');
+                
+            } catch (error) {
+                console.error('Error saving scores:', error);
+                showAlert('Error saving scores.');
+            }
+        }
+
+        function clearTeacherScores() {
+            document.querySelectorAll('#teacherScoresTableBody input').forEach(input => {
+                input.value = '';
+                updateTeacherScore(input);
+            });
+        }
+
+        // Report generation
+        async function generateTeacherReport() {
+            const studentDocId = document.getElementById('teacherReportStudentSelect').value;
+            const term = document.getElementById('teacherReportTerm').value;
+            const year = document.getElementById('teacherReportYear').value;
+            
+            if (!studentDocId) {
+                showAlert('Please select a student');
+                return;
+            }
+
+            try {
+                // Get student data
+                const studentDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'students', studentDocId));
+                if (!studentDoc.exists()) {
+                    showAlert('Student not found!');
+                    return;
+                }
+
+                const student = studentDoc.data();
+                const subjects = getSubjectsForClass(student.class);
+                
+                // Get scores
+                const scoresDocId = `${studentDocId}_${term}_${year}`;
+                const scoresDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'scores', scoresDocId));
+                const studentScores = scoresDoc.exists() ? scoresDoc.data().subjects || {} : {};
+                
+                // Check if student has any scores
+                const hasScores = Object.values(studentScores).some(score => 
+                    (score.sba && score.sba > 0) || (score.exam && score.exam > 0)
+                );
+                
+                if (!hasScores) {
+                    showAlert('No scores found for this student in the selected term. Please enter scores first.');
+                    return;
+                }
+
+                const reportCard = document.getElementById('teacherReportCard');
+                const reportActionsNav = document.getElementById('teacherReportActionsNav');
+                
+                // Generate report based on class level
+                if (isBasic16Class(student.class)) {
+                    generateBasic16Report(student, studentScores, term, year, subjects);
+                } else {
+                    generateBasic79Report(student, studentScores, term, year, subjects);
+                }
+
+                reportCard.classList.remove('hidden');
+                reportActionsNav.classList.remove('hidden');
+
+                // Update teacher's report count
+                const teacherRef = window.firestore.doc(window.db, 'teachers', currentUser.uid);
+                const teacherDoc = await window.firestore.getDoc(teacherRef);
+                if (teacherDoc.exists()) {
+                    const currentCount = teacherDoc.data().reportsCreated || 0;
+                    await window.firestore.updateDoc(teacherRef, {
+                        reportsCreated: currentCount + 1,
+                        lastActive: window.firestore.serverTimestamp()
+                    });
+                }
+
+                // Log activity
+                await logActivity(`Generated report card for ${student.name} - ${term} ${year}`, 'report_generated');
+
+                loadTeacherData(); // Refresh stats
+
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showAlert('Error generating report.');
+            }
+        }
+
+        // Generate Basic 1-6 Report (using REPORT TINA template)
+        function generateBasic16Report(student, studentScores, term, year, subjects) {
+            let scoresTable = '';
+            let totalScore = 0;
+            let subjectCount = 0;
+            
+            subjects.forEach(subject => {
+                const subjectScore = studentScores[subject] || { sba: 0, exam: 0 };
+                const total = subjectScore.sba + subjectScore.exam;
+                const gradeInfo = total > 0 ? calculateGrade(total) : { grade: '', remark: '' };
+                
+                if (total > 0) {
+                    totalScore += total;
+                    subjectCount++;
+                }
+                
+                scoresTable += `
+                    <tr>
+                        <td class="border border-black px-2 py-1">${subject}</td>
+                        <td class="border border-black px-2 py-1 text-center">${subjectScore.sba || ''}</td>
+                        <td class="border border-black px-2 py-1 text-center">${subjectScore.exam || ''}</td>
+                        <td class="border border-black px-2 py-1 text-center font-semibold">${total > 0 ? Math.round(total) : ''}</td>
+                        <td class="border border-black px-2 py-1 text-center">${gradeInfo.grade}</td>
+                        <td class="border border-black px-2 py-1 text-center">-</td>
+                        <td class="border border-black px-2 py-1 text-center">${gradeInfo.remark}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('teacherReportCard').innerHTML = `
+                <div class="p-8 report-card">
+                    <div class="text-center mb-6">
+                        <h1 class="text-3xl font-bold">PRINCE EMMANUEL SCHOOL COMPLEX</h1>
+                        <div class="mt-4 text-lg space-y-2">
+                            <div class="grid grid-cols-2 gap-8">
+                                <div class="text-left">
+                                    <p><strong>BASIC:</strong> ${student.class}</p>
+                                    <p><strong>YEAR:</strong> ${year}</p>
+                                    <p><strong>NAME:</strong> ${student.name}</p>
+                                </div>
+                                <div class="text-left">
+                                    <p><strong>OVERALL POSITION:</strong> ___</p>
+                                    <p><strong>TERM:</strong> ${term}</p>
+                                    <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-8">
+                                <p><strong>NO. ON ROLL:</strong> ${student.id}</p>
+                                <p><strong>NEXT TERM BEGINNING:</strong> _________________</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full border-collapse border border-black text-sm mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-black px-2 py-2">SUBJECT</th>
+                                <th class="border border-black px-2 py-2">SBA<br>SCORE<br>30%</th>
+                                <th class="border border-black px-2 py-2">EXAM<br>SCORE<br>70%</th>
+                                <th class="border border-black px-2 py-2">TOTAL<br>SCORE<br>100%</th>
+                                <th class="border border-black px-2 py-2">GRADE</th>
+                                <th class="border border-black px-2 py-2">POSITION</th>
+                                <th class="border border-black px-2 py-2">REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scoresTable}
+                        </tbody>
+                    </table>
+                    
+                    <div class="grid grid-cols-2 gap-8 text-sm">
+                        <div class="space-y-4">
+                            <p><strong>Attendance:</strong> _____ Out of Total Of _____</p>
+                            <p><strong>PROMOTED TO:</strong> _____________________</p>
+                            <p><strong>Talent and Interest:</strong> ${student.talent}</p>
+                            <div>
+                                <p><strong>Conduct-comment on pupil's courtesy, emotional control, initiative,</strong></p>
+                                <p><strong>dependability and sense of cooperation:</strong></p>
+                                <div class="border border-black h-16 mt-2 p-2">
+                                    
+                                </div>
+                            </div>
+                            <p><strong>Class Teacher's Remarks:</strong> _____________________</p>
+                            <p><strong>Head Teacher's Remarks:</strong> _____________________</p>
+                            <p><strong>Date:</strong> ${new Date().toLocaleDateString()} &nbsp;&nbsp;&nbsp;&nbsp; <strong>Signature:</strong> _____</p>
+                        </div>
+                        
+                        <div>
+                            <table class="w-full border-collapse border border-black text-xs">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-black px-2 py-1">DETAIL</th>
+                                        <th class="border border-black px-2 py-1">GH₵</th>
+                                        <th class="border border-black px-2 py-1">GHP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">ARREARS FROM LAST TERM</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">TUITION/SCHOOL FEES</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">PTA DUES</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">MEDICAL</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">BUILDING FUND</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr class="font-bold bg-gray-100">
+                                        <td class="border border-black px-2 py-1">TOTAL</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-center text-sm">
+                        <p class="font-bold">© 2025 Prince Emmanuel School Complex</p>
+                        <p class="text-gray-600 mt-1">Created by Joel Tozo</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generate Basic 7-9 Report (using previous template)
+        function generateBasic79Report(student, studentScores, term, year, subjects) {
+            let scoresTable = '';
+            let totalScore = 0;
+            let subjectCount = 0;
+            
+            subjects.forEach(subject => {
+                const subjectScore = studentScores[subject] || { sba: 0, exam: 0 };
+                const total = subjectScore.sba + subjectScore.exam;
+                const gradeInfo = total > 0 ? calculateGrade(total) : { grade: '', remark: '' };
+                
+                if (total > 0) {
+                    totalScore += total;
+                    subjectCount++;
+                }
+                
+                scoresTable += `
+                    <tr>
+                        <td class="border border-black px-2 py-1">${subject}</td>
+                        <td class="border border-black px-2 py-1 text-center">${subjectScore.sba || ''}</td>
+                        <td class="border border-black px-2 py-1 text-center">${subjectScore.exam || ''}</td>
+                        <td class="border border-black px-2 py-1 text-center font-semibold">${total > 0 ? Math.round(total) : ''}</td>
+                        <td class="border border-black px-2 py-1 text-center">${gradeInfo.grade}</td>
+                        <td class="border border-black px-2 py-1 text-center">-</td>
+                        <td class="border border-black px-2 py-1 text-center">${gradeInfo.remark}</td>
+                    </tr>
+                `;
+            });
+
+            const averageScore = subjectCount > 0 ? Math.round(totalScore / subjectCount) : 0;
+
+            document.getElementById('teacherReportCard').innerHTML = `
+                <div class="p-8 report-card">
+                    <div class="text-center mb-6">
+                        <h1 class="text-3xl font-bold">PRINCE EMMANUEL SCHOOL COMPLEX</h1>
+                        <div class="mt-4 text-lg space-y-2">
+                            <div class="grid grid-cols-2 gap-8">
+                                <div class="text-left">
+                                    <p><strong>CLASS:</strong> ${student.class}</p>
+                                    <p><strong>YEAR:</strong> ${year}</p>
+                                    <p><strong>NAME:</strong> ${student.name}</p>
+                                </div>
+                                <div class="text-left">
+                                    <p><strong>OVERALL POSITION:</strong> ___</p>
+                                    <p><strong>TERM:</strong> ${term}</p>
+                                    <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-8">
+                                <p><strong>NO. ON ROLL:</strong> ${student.id}</p>
+                                <p><strong>NEXT TERM BEGINNING:</strong> _________________</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="w-full border-collapse border border-black text-sm mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-black px-2 py-2">SUBJECT</th>
+                                <th class="border border-black px-2 py-2">SBA<br>SCORE<br>30%</th>
+                                <th class="border border-black px-2 py-2">EXAM<br>SCORE<br>70%</th>
+                                <th class="border border-black px-2 py-2">TOTAL<br>SCORE<br>100%</th>
+                                <th class="border border-black px-2 py-2">GRADE</th>
+                                <th class="border border-black px-2 py-2">POSITION</th>
+                                <th class="border border-black px-2 py-2">REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scoresTable}
+                        </tbody>
+                    </table>
+                    
+                    <div class="grid grid-cols-2 gap-8 text-sm">
+                        <div class="space-y-4">
+                            <p><strong>Attendance:</strong> _____ Out of Total Of _____</p>
+                            <p><strong>PROMOTED TO:</strong> _____________________</p>
+                            <p><strong>Talent and Interest:</strong> ${student.talent}</p>
+                            <div>
+                                <p><strong>Conduct-comment on pupil's courtesy, emotional control, initiative,</strong></p>
+                                <p><strong>dependability and sense of cooperation:</strong></p>
+                                <div class="border border-black h-16 mt-2 p-2">
+                                    Satisfactory
+                                </div>
+                            </div>
+                            <p><strong>Class Teacher's Remarks:</strong> _____________________</p>
+                            <p><strong>Head Teacher's Remarks:</strong> _____________________</p>
+                            <p><strong>Date:</strong> ${new Date().toLocaleDateString()} &nbsp;&nbsp;&nbsp;&nbsp; <strong>Signature:</strong> _____</p>
+                        </div>
+                        
+                        <div>
+                            <table class="w-full border-collapse border border-black text-xs">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-black px-2 py-1">FEE DETAIL</th>
+                                        <th class="border border-black px-2 py-1">AMOUNT (₵)</th>
+                                        <th class="border border-black px-2 py-1">PAID (₵)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">ARREARS FROM LAST TERM</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">TUITION/SCHOOL FEES</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">PTA DUES</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">MEDICAL</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-black px-2 py-1">BUILDING FUND</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr class="font-bold bg-gray-100">
+                                        <td class="border border-black px-2 py-1">TOTAL FEES</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                        <td class="border border-black px-2 py-1">_____</td>
+                                    </tr>
+                                    <tr class="bg-gray-100">
+                                        <td class="border border-black px-2 py-1">BALANCE</td>
+                                        <td class="border border-black px-2 py-1" colspan="2">_________________</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-center text-sm">
+                        <p class="font-bold">© 2025 Prince Emmanuel School Complex</p>
+                        <p class="text-gray-600 mt-1">Created by Joel Tozo</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Report sharing functions
+        function printTeacherReport() {
+            window.print();
+        }
+
+        function downloadTeacherReportPDF() {
+            const reportCard = document.getElementById('teacherReportCard');
+            
+            html2canvas(reportCard, {
+                scale: 2,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                const studentName = document.getElementById('teacherReportStudentSelect').selectedOptions[0].text.split(' - ')[0];
+                const term = document.getElementById('teacherReportTerm').value;
+                const year = document.getElementById('teacherReportYear').value;
+                
+                pdf.save(`${studentName}_${term}_${year}_Report.pdf`);
+            });
+        }
+
+        async function shareTeacherReportToParent() {
+            const studentDocId = document.getElementById('teacherReportStudentSelect').value;
+            
+            if (!studentDocId) {
+                showAlert('No student selected');
+                return;
+            }
+
+            try {
+                const studentDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'students', studentDocId));
+                if (!studentDoc.exists()) {
+                    showAlert('Student not found');
+                    return;
+                }
+
+                const student = studentDoc.data();
+                const term = document.getElementById('teacherReportTerm').value;
+                const year = document.getElementById('teacherReportYear').value;
+                
+                // Clean phone number
+                let parentPhone = student.parentPhone.replace(/\D/g, '');
+                if (parentPhone.startsWith('0')) {
+                    parentPhone = '233' + parentPhone.substring(1);
+                } else if (!parentPhone.startsWith('233')) {
+                    parentPhone = '233' + parentPhone;
+                }
+                
+                const message = `Dear ${student.parentName},\n\nThe report card for ${student.name} (${student.class}) for ${term} ${year} has been generated and is ready.\n\nPlease visit the school to collect the report card during school hours.\n\nBest regards,\nPrince Emmanuel School Complex`;
+                
+                const url = `https://wa.me/${parentPhone}?text=${encodeURIComponent(message)}`;
+                window.open(url, '_blank');
+                
+                showAlert(`WhatsApp message sent to ${student.parentName} (${student.parentPhone})`);
+
+            } catch (error) {
+                console.error('Error sharing report:', error);
+                showAlert('Error sharing report.');
+            }
+        }
+
+        // Admin Functions
+        async function loadAdminData() {
+            if (!currentUser || currentUserRole !== 'admin') return;
+
+            try {
+                // Load teachers count
+                const teachersSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'teachers'));
+                document.getElementById('adminTeacherCount').textContent = teachersSnapshot.size;
+
+                // Load students count
+                const studentsSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'students'));
+                document.getElementById('adminStudentCount').textContent = studentsSnapshot.size;
+
+                // Load activities count
+                const activitiesSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'activities'));
+                document.getElementById('adminReportCount').textContent = activitiesSnapshot.size;
+
+                // Load active sessions (placeholder)
+                document.getElementById('adminActiveCount').textContent = '1';
+                document.getElementById('activeSessions').textContent = '1';
+
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            }
+        }
+
+        async function loadAdminTeachers() {
+            try {
+                const teachersSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'teachers'));
+                const tbody = document.getElementById('adminTeachersTable');
+                tbody.innerHTML = '';
+
+                if (teachersSnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No teachers found.</td></tr>';
+                    return;
+                }
+
+                teachersSnapshot.forEach((doc, index) => {
+                    const teacher = doc.data();
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-medium">${teacher.firstName} ${teacher.lastName}</td>
+                        <td class="px-6 py-4">${teacher.email}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                ${teacher.subjects ? teacher.subjects.join(', ') : 'N/A'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">${teacher.studentsAdded || 0}</td>
+                        <td class="px-6 py-4 text-center">${teacher.reportsCreated || 0}</td>
+                        <td class="px-6 py-4">${teacher.lastActive ? new Date(teacher.lastActive.seconds * 1000).toLocaleDateString() : 'Never'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error loading teachers:', error);
+            }
+        }
+
+        async function loadAdminStudents() {
+            try {
+                const studentsSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'students'));
+                const tbody = document.getElementById('adminStudentsTable');
+                tbody.innerHTML = '';
+
+                if (studentsSnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>';
+                    return;
+                }
+
+                // Get teacher names for display
+                const teachersSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'teachers'));
+                const teacherNames = {};
+                teachersSnapshot.forEach(doc => {
+                    const teacher = doc.data();
+                    teacherNames[doc.id] = `${teacher.firstName} ${teacher.lastName}`;
+                });
+
+                studentsSnapshot.forEach((doc, index) => {
+                    const student = doc.data();
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white hover:bg-green-50' : 'bg-gray-50 hover:bg-green-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-semibold text-green-600">${student.id}</td>
+                        <td class="px-6 py-4 font-medium">${student.name}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                ${student.class}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">${teacherNames[student.teacherId] || 'Unknown'}</td>
+                        <td class="px-6 py-4">${student.createdAt ? new Date(student.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                        <td class="px-6 py-4 text-center">0</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        async function loadAdminActivities() {
+            try {
+                const activitiesQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'activities'),
+                    window.firestore.orderBy('timestamp', 'desc')
+                );
+                const activitiesSnapshot = await window.firestore.getDocs(activitiesQuery);
+                
+                const container = document.getElementById('adminActivitiesLog');
+                container.innerHTML = '';
+
+                if (activitiesSnapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-500">No activities recorded</p>';
+                    return;
+                }
+
+                activitiesSnapshot.forEach(doc => {
+                    const activity = doc.data();
+                    const activityDiv = document.createElement('div');
+                    activityDiv.className = 'p-3 bg-gray-50 rounded-lg border';
+                    activityDiv.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">${activity.description}</span>
+                            <span class="text-sm text-gray-500">${new Date(activity.timestamp.seconds * 1000).toLocaleString()}</span>
+                        </div>
+                        <span class="text-xs text-blue-600">${activity.type}</span>
+                    `;
+                    container.appendChild(activityDiv);
+                });
+
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
+        }
+
+        async function loadAdminReports() {
+            // Load system analytics and export options
+            const container = document.getElementById('systemAnalytics');
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span>Database Status:</span>
+                        <span class="text-green-600 font-semibold">Online</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Data Integrity:</span>
+                        <span class="text-green-600 font-semibold">Good</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Last Backup:</span>
+                        <span class="text-green-600 font-semibold">Current</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export functions
+        async function exportTeachersData() {
+            try {
+                const teachersSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'teachers'));
+                const teachersData = [];
+
+                teachersSnapshot.forEach(doc => {
+                    const teacher = doc.data();
+                    teachersData.push({
+                        'Teacher ID': doc.id,
+                        'First Name': teacher.firstName,
+                        'Last Name': teacher.lastName,
+                        'Email': teacher.email,
+                        'Phone': teacher.phone,
+                        'Subjects': teacher.subjects ? teacher.subjects.join(', ') : '',
+                        'Students Added': teacher.studentsAdded || 0,
+                        'Reports Created': teacher.reportsCreated || 0,
+                        'Created Date': teacher.createdAt ? new Date(teacher.createdAt.seconds * 1000).toLocaleDateString() : ''
+                    });
+                });
+
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(teachersData);
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Teachers');
+                XLSX.writeFile(workbook, `PESC_Teachers_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+                await logActivity('Exported teachers data', 'data_export');
+                showAlert('Teachers data exported successfully!');
+
+            } catch (error) {
+                console.error('Error exporting teachers data:', error);
+                showAlert('Error exporting teachers data.');
+            }
+        }
+
+        async function exportAllStudentsData() {
+            try {
+                const studentsSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'students'));
+                const teachersSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'teachers'));
+                
+                // Create teacher name mapping
+                const teacherNames = {};
+                teachersSnapshot.forEach(doc => {
+                    const teacher = doc.data();
+                    teacherNames[doc.id] = `${teacher.firstName} ${teacher.lastName}`;
+                });
+
+                const studentsData = [];
+
+                studentsSnapshot.forEach(doc => {
+                    const student = doc.data();
+                    studentsData.push({
+                        'Student ID': student.id,
+                        'Name': student.name,
+                        'Class': student.class,
+                        'Gender': student.gender,
+                        'Date of Birth': student.dob,
+                        'Parent/Guardian': student.parentName,
+                        'Phone': student.parentPhone,
+                        'Talents & Interest': student.talent,
+                        'Address': student.address || '',
+                        'Added By': teacherNames[student.teacherId] || 'Unknown',
+                        'Added Date': student.createdAt ? new Date(student.createdAt.seconds * 1000).toLocaleDateString() : ''
+                    });
+                });
+
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(studentsData);
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+                XLSX.writeFile(workbook, `PESC_All_Students_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+                await logActivity('Exported all students data', 'data_export');
+                showAlert('Students data exported successfully!');
+
+            } catch (error) {
+                console.error('Error exporting students data:', error);
+                showAlert('Error exporting students data.');
+            }
+        }
+
+        async function exportActivitiesLog() {
+            try {
+                const activitiesSnapshot = await window.firestore.getDocs(window.firestore.collection(window.db, 'activities'));
+                const activitiesData = [];
+
+                activitiesSnapshot.forEach(doc => {
+                    const activity = doc.data();
+                    activitiesData.push({
+                        'Activity ID': doc.id,
+                        'Description': activity.description,
+                        'Type': activity.type,
+                        'User ID': activity.userId,
+                        'Timestamp': activity.timestamp ? new Date(activity.timestamp.seconds * 1000).toLocaleString() : ''
+                    });
+                });
+
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(activitiesData);
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Activities');
+                XLSX.writeFile(workbook, `PESC_Activities_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+                await logActivity('Exported activities log', 'data_export');
+                showAlert('Activities log exported successfully!');
+
+            } catch (error) {
+                console.error('Error exporting activities log:', error);
+                showAlert('Error exporting activities log.');
+            }
+        }
+
+        // Delete student function
+        async function deleteStudent(studentDocId) {
+            if (!currentUser || currentUserRole !== 'teacher') {
+                showAlert('Only teachers can delete students.');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this student? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                // Get student data before deletion
+                const studentDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'students', studentDocId));
+                const studentData = studentDoc.data();
+
+                // Delete student
+                await window.firestore.deleteDoc(window.firestore.doc(window.db, 'students', studentDocId));
+
+                // Delete related scores
+                const scoresQuery = window.firestore.query(
+                    window.firestore.collection(window.db, 'scores'),
+                    window.firestore.where('studentId', '==', studentDocId)
+                );
+                const scoresSnapshot = await window.firestore.getDocs(scoresQuery);
+                const deletePromises = scoresSnapshot.docs.map(doc => window.firestore.deleteDoc(doc.ref));
+                await Promise.all(deletePromises);
+
+                // Update teacher's student count
+                const teacherRef = window.firestore.doc(window.db, 'teachers', currentUser.uid);
+                const teacherDoc = await window.firestore.getDoc(teacherRef);
+                if (teacherDoc.exists()) {
+                    const currentCount = teacherDoc.data().studentsAdded || 0;
+                    await window.firestore.updateDoc(teacherRef, {
+                        studentsAdded: Math.max(0, currentCount - 1),
+                        lastActive: window.firestore.serverTimestamp()
+                    });
+                }
+
+                // Log activity
+                await logActivity(`Deleted student: ${studentData.name} (${studentData.id})`, 'student_deleted');
+
+                showAlert('Student deleted successfully!');
+                loadTeacherStudents();
+                loadTeacherData();
+
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showAlert('Error deleting student.');
+            }
+        }
+
+        // Log activity function
+        async function logActivity(description, type) {
+            if (!currentUser) return;
+
+            try {
+                await window.firestore.addDoc(window.firestore.collection(window.db, 'activities'), {
+                    description: description,
+                    type: type,
+                    userId: currentUser.uid,
+                    timestamp: window.firestore.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error logging activity:', error);
+            }
+        }
+
+        // Utility functions
+        function showAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white backdrop-blur-lg p-6 rounded-2xl shadow-2xl max-w-sm w-full animate-bounce-in">
+                    <div class="text-center">
+                        <i class="fas fa-info-circle text-blue-500 text-5xl mb-4"></i>
+                        <h3 class="text-lg font-semibold mb-2 text-blue-600">Information</h3>
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <button onclick="this.closest('.fixed').remove()" class="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-300">OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                if (modal && modal.parentNode) {
+                    modal.remove();
+                }
+            }, 8000);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-load dropdowns when sections change
+            document.addEventListener('click', function(event) {
+                if (event.target.closest('[onclick*="showTeacherSection(\'students\')"]')) {
+                    setTimeout(loadTeacherStudents, 100);
+                }
+                if (event.target.closest('[onclick*="showTeacherSection(\'academics\')"]')) {
+                    setTimeout(loadTeacherAcademics, 100);
+                }
+                if (event.target.closest('[onclick*="showTeacherSection(\'reports\')"]')) {
+                    setTimeout(loadTeacherReports, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
