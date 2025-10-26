@@ -161,6 +161,49 @@
             border-color: #6366f1;
             color: white;
         }
+
+        /* Profile picture styles */
+        .profile-picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6366f1;
+        }
+
+        .profile-picture-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #6366f1;
+        }
+
+        .profile-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .profile-placeholder-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 3rem;
+        }
         
         @media print {
             body * { visibility: hidden; }
@@ -181,6 +224,26 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Image upload styles */
+        .image-upload-area {
+            border: 2px dashed #6366f1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-upload-area:hover {
+            border-color: #ec4899;
+            background-color: #f8fafc;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #10b981;
+            background-color: #f0fdf4;
         }
     </style>
 </head>
@@ -218,113 +281,172 @@
             <div class="text-center mb-6">
                 <i class="fas fa-chalkboard-teacher text-5xl text-blue-600 mb-4"></i>
                 <h2 class="text-2xl font-bold text-blue-600">Teacher Portal</h2>
-                <p class="text-gray-600">Login to Your Account</p>
+                <p class="text-gray-600">Sign in with Google</p>
             </div>
             
             <div id="teacherLogin">
-                <form id="teacherLoginForm" onsubmit="teacherLogin(event)">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Email Address</label>
-                        <input type="email" id="teacherEmail" required class="w-full px-3 py-3 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium mb-2">Password</label>
-                        <input type="password" id="teacherPassword" required class="w-full px-3 py-3 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                    </div>
-                    <button type="submit" id="teacherLoginBtn" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300">
-                        Login
+                <div class="mb-6 text-center">
+                    <button id="teacherGoogleSignIn" onclick="teacherGoogleLogin()" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 px-4 rounded-xl font-semibold hover:bg-gray-50 hover:border-blue-400 transform transition-all duration-300 hover-lift shadow-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Sign in with Google
                     </button>
-                </form>
-                <p class="mt-4 text-center text-sm">
-                    Don't have an account? <a href="#" onclick="showTeacherSignup()" class="text-blue-600 hover:underline">Sign up here</a>
-                </p>
-            </div>
-
-            <div id="teacherSignup" class="hidden">
-                <form id="teacherSignupForm" onsubmit="teacherSignup(event)">
-                    <h3 class="text-lg font-semibold mb-4">Create Teacher Account</h3>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">First Name</label>
-                            <input type="text" id="teacherFirstName" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Last Name</label>
-                            <input type="text" id="teacherLastName" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Email Address</label>
-                        <input type="email" id="signupTeacherEmail" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Phone Number</label>
-                        <input type="tel" id="teacherPhone" required class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Subject Specialization (Select Multiple)</label>
-                        <div class="max-h-40 overflow-y-auto border-2 border-blue-300 rounded-xl p-2 bg-white">
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'English Language')">
-                                <input type="checkbox" class="mr-2"> English Language
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Mathematics')">
-                                <input type="checkbox" class="mr-2"> Mathematics
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Science')">
-                                <input type="checkbox" class="mr-2"> Science
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Social Studies')">
-                                <input type="checkbox" class="mr-2"> Social Studies
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Computing')">
-                                <input type="checkbox" class="mr-2"> Computing
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Career Technology')">
-                                <input type="checkbox" class="mr-2"> Career Technology
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative And Design')">
-                                <input type="checkbox" class="mr-2"> Creative And Design
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative Art')">
-                                <input type="checkbox" class="mr-2"> Creative Art
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Religious And Moral Edu.')">
-                                <input type="checkbox" class="mr-2"> Religious And Moral Edu.
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Fantse')">
-                                <input type="checkbox" class="mr-2"> Fantse
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'Owop')">
-                                <input type="checkbox" class="mr-2"> Owop
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'History')">
-                                <input type="checkbox" class="mr-2"> History
-                            </div>
-                            <div class="subject-checkbox" onclick="toggleSubject(this, 'General Teacher')">
-                                <input type="checkbox" class="mr-2"> General Teacher
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Password</label>
-                            <input type="password" id="signupTeacherPassword" required minlength="6" class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Confirm Password</label>
-                            <input type="password" id="confirmTeacherPassword" required minlength="6" class="w-full px-3 py-2 text-base border-2 border-blue-300 rounded-xl bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-500">
-                        </div>
-                    </div>
-                    <button type="submit" id="teacherSignupBtn" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300">
-                        Create Account
-                    </button>
-                </form>
-                <p class="mt-4 text-center text-sm">
-                    Already have an account? <a href="#" onclick="showTeacherLogin()" class="text-blue-600 hover:underline">Login here</a>
-                </p>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600">New teacher? You'll be prompted to complete your profile after signing in.</p>
+                </div>
             </div>
             
             <button onclick="goHome()" class="mt-4 text-blue-600 hover:underline text-sm">← Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Teacher Profile Setup Modal -->
+    <div id="teacherProfileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white backdrop-blur-lg rounded-2xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto animate-bounce-in">
+                <div class="p-6">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-bold text-primary">Complete Your Teacher Profile</h3>
+                        <p class="text-gray-600">Please provide additional information to set up your account</p>
+                    </div>
+                    
+                    <form id="teacherProfileForm" onsubmit="completeTeacherProfile(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Profile Picture Section -->
+                            <div class="md:col-span-2 text-center mb-6">
+                                <div class="flex flex-col items-center">
+                                    <div id="teacherProfilePicturePreview" class="profile-placeholder-large mb-4">
+                                        ?
+                                    </div>
+                                    <button type="button" onclick="showImageUploadModal('teacher')" class="bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary/90 transition-all duration-300">
+                                        <i class="fas fa-camera mr-2"></i>Add Profile Picture
+                                    </button>
+                                    <p class="text-sm text-gray-500 mt-2">Optional - You can add this later</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Phone Number</label>
+                                <input type="tel" id="teacherProfilePhone" required class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Department</label>
+                                <select id="teacherDepartment" class="w-full px-3 py-3 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                                    <option value="Primary">Primary</option>
+                                    <option value="Junior High">Junior High</option>
+                                    <option value="Administration">Administration</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-2">Subject Specialization (Select Multiple)</label>
+                                <div class="max-h-40 overflow-y-auto border-2 border-primary/30 rounded-xl p-2 bg-white">
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'English Language')">
+                                        <input type="checkbox" class="mr-2"> English Language
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Mathematics')">
+                                        <input type="checkbox" class="mr-2"> Mathematics
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Science')">
+                                        <input type="checkbox" class="mr-2"> Science
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Social Studies')">
+                                        <input type="checkbox" class="mr-2"> Social Studies
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Computing')">
+                                        <input type="checkbox" class="mr-2"> Computing
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Career Technology')">
+                                        <input type="checkbox" class="mr-2"> Career Technology
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative And Design')">
+                                        <input type="checkbox" class="mr-2"> Creative And Design
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Creative Art')">
+                                        <input type="checkbox" class="mr-2"> Creative Art
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Religious And Moral Edu.')">
+                                        <input type="checkbox" class="mr-2"> Religious And Moral Edu.
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Fantse')">
+                                        <input type="checkbox" class="mr-2"> Fantse
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'Owop')">
+                                        <input type="checkbox" class="mr-2"> Owop
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'History')">
+                                        <input type="checkbox" class="mr-2"> History
+                                    </div>
+                                    <div class="subject-checkbox" onclick="toggleSubject(this, 'General Teacher')">
+                                        <input type="checkbox" class="mr-2"> General Teacher
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-end space-x-4">
+                            <button type="submit" id="completeProfileBtn" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 shadow-lg">
+                                Complete Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Upload Modal -->
+    <div id="imageUploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white backdrop-blur-lg rounded-2xl shadow-2xl max-w-md w-full animate-bounce-in">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-primary">Add Profile Picture</h3>
+                        <button onclick="hideImageUploadModal()" class="text-gray-400 hover:text-red-500 transition-colors duration-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- File Upload -->
+                        <div class="image-upload-area" onclick="document.getElementById('imageFileInput').click()">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-primary mb-2"></i>
+                            <p class="text-primary font-semibold">Upload from Device</p>
+                            <p class="text-sm text-gray-500">Click to select an image</p>
+                            <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                        </div>
+
+                        <!-- URL Input -->
+                        <div class="border-t pt-4">
+                            <label class="block text-sm font-medium mb-2">Or enter image URL:</label>
+                            <input type="url" id="imageUrlInput" placeholder="https://example.com/image.jpg" class="w-full px-3 py-2 text-base border-2 border-primary/30 rounded-xl bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary">
+                            <button type="button" onclick="handleImageUrl()" class="mt-2 w-full bg-secondary text-white px-4 py-2 rounded-xl hover:bg-secondary/90 transition-all duration-300">
+                                Use URL
+                            </button>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div id="imagePreviewContainer" class="hidden text-center">
+                            <img id="imagePreview" class="profile-picture-large mx-auto mb-4" alt="Preview">
+                            <div class="flex space-x-3">
+                                <button onclick="confirmImageSelection()" class="flex-1 bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition-all duration-300">
+                                    Use This Image
+                                </button>
+                                <button onclick="resetImageUpload()" class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition-all duration-300">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -364,9 +486,18 @@
                             <p class="text-xs text-blue-200" id="teacherWelcome">Welcome, Teacher</p>
                         </div>
                     </div>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-sm transition-all duration-300">
-                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
-                    </button>
+                    <div class="flex items-center space-x-4">
+                        <!-- Teacher Profile Picture -->
+                        <div class="flex items-center space-x-2 cursor-pointer" onclick="showTeacherProfileModal()">
+                            <div id="teacherHeaderProfilePic" class="profile-placeholder">
+                                T
+                            </div>
+                            <span class="text-sm font-medium">Profile</span>
+                        </div>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-sm transition-all duration-300">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -486,6 +617,7 @@
                     <table class="w-full">
                         <thead class="bg-blue-500 text-white">
                             <tr>
+                                <th class="px-6 py-4 text-left">Photo</th>
                                 <th class="px-6 py-4 text-left">Student ID</th>
                                 <th class="px-6 py-4 text-left">Name</th>
                                 <th class="px-6 py-4 text-left">Class</th>
@@ -603,6 +735,35 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Teacher Profile Modal -->
+    <div id="teacherProfileViewModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white backdrop-blur-lg rounded-2xl shadow-2xl max-w-md w-full animate-bounce-in">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-primary">Teacher Profile</h3>
+                        <button onclick="hideTeacherProfileModal()" class="text-gray-400 hover:text-red-500 transition-colors duration-300">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <div id="teacherProfileModalPic" class="profile-placeholder-large mx-auto mb-4">
+                            T
+                        </div>
+                        <button onclick="showImageUploadModal('teacherProfile')" class="bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary/90 transition-all duration-300">
+                            <i class="fas fa-camera mr-2"></i>Change Picture
+                        </button>
+                    </div>
+
+                    <div id="teacherProfileInfo" class="space-y-3 text-sm">
+                        <!-- Profile info will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Admin Dashboard -->
@@ -737,9 +898,11 @@
                     <table class="w-full">
                         <thead class="bg-blue-500 text-white">
                             <tr>
+                                <th class="px-6 py-4 text-left">Photo</th>
                                 <th class="px-6 py-4 text-left">Name</th>
                                 <th class="px-6 py-4 text-left">Email</th>
                                 <th class="px-6 py-4 text-left">Phone</th>
+                                <th class="px-6 py-4 text-left">Department</th>
                                 <th class="px-6 py-4 text-left">Subjects</th>
                                 <th class="px-6 py-4 text-left">Students Added</th>
                                 <th class="px-6 py-4 text-left">Reports Created</th>
@@ -762,6 +925,7 @@
                     <table class="w-full">
                         <thead class="bg-green-500 text-white">
                             <tr>
+                                <th class="px-6 py-4 text-left">Photo</th>
                                 <th class="px-6 py-4 text-left">Student ID</th>
                                 <th class="px-6 py-4 text-left">Name</th>
                                 <th class="px-6 py-4 text-left">Class</th>
@@ -842,6 +1006,19 @@
                     </div>
                     
                     <form id="addStudentForm" onsubmit="addStudent(event)">
+                        <!-- Student Picture Section -->
+                        <div class="text-center mb-6">
+                            <div class="flex flex-col items-center">
+                                <div id="studentProfilePicturePreview" class="profile-placeholder-large mb-4">
+                                    S
+                                </div>
+                                <button type="button" onclick="showImageUploadModal('student')" class="bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary/90 transition-all duration-300">
+                                    <i class="fas fa-camera mr-2"></i>Add Student Picture
+                                </button>
+                                <p class="text-sm text-gray-500 mt-2">Optional - You can add this later</p>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium mb-2">Student ID</label>
@@ -924,11 +1101,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { 
             getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
+            GoogleAuthProvider,
+            signInWithPopup,
             signOut, 
-            onAuthStateChanged,
-            connectAuthEmulator 
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { 
             getFirestore, 
@@ -943,8 +1119,7 @@
             orderBy, 
             updateDoc, 
             deleteDoc, 
-            serverTimestamp,
-            connectFirestoreEmulator 
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         // Firebase configuration
@@ -969,12 +1144,17 @@
         const db = getFirestore(app);
         console.log('Firestore initialized:', db);
 
+        // Initialize Google Auth Provider
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.addScope('profile');
+        googleProvider.addScope('email');
+
         // Make Firebase available globally
         window.auth = auth;
         window.db = db;
+        window.googleProvider = googleProvider;
         window.firebaseAuth = { 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
+            signInWithPopup,
             signOut, 
             onAuthStateChanged 
         };
@@ -1018,6 +1198,8 @@
         let currentUserRole = null;
         let selectedSubjects = [];
         let isFirebaseReady = false;
+        let currentImageTarget = null;
+        let tempImageUrl = null;
 
         // Wait for Firebase to be ready
         window.addEventListener('firebaseReady', () => {
@@ -1038,13 +1220,11 @@
                         currentUserRole = null;
                         console.log('User signed out');
                         // Reset button states when logged out
-                        setButtonLoading('teacherLoginBtn', false);
-                        setButtonLoading('teacherSignupBtn', false);
+                        setButtonLoading('teacherGoogleSignIn', false);
                     }
                 } catch (error) {
                     console.error('Error in auth state change handler:', error);
-                    setButtonLoading('teacherLoginBtn', false);
-                    setButtonLoading('teacherSignupBtn', false);
+                    setButtonLoading('teacherGoogleSignIn', false);
                 }
             });
         });
@@ -1098,6 +1278,24 @@
             return isBasic16Class(className) ? subjectsBasic16 : subjectsBasic79;
         }
 
+        // Helper function to get initials from name
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        // Helper function to create profile picture element
+        function createProfilePicture(imageUrl, name, size = 'small') {
+            const sizeClass = size === 'large' ? 'profile-picture-large' : 'profile-picture';
+            const placeholderClass = size === 'large' ? 'profile-placeholder-large' : 'profile-placeholder';
+            
+            if (imageUrl) {
+                return `<img src="${imageUrl}" alt="${name}" class="${sizeClass}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="${placeholderClass}" style="display: none;">${getInitials(name)}</div>`;
+            } else {
+                return `<div class="${placeholderClass}">${getInitials(name)}</div>`;
+            }
+        }
+
         // Check user role in Firestore
         async function checkUserRole() {
             if (!currentUser) return;
@@ -1114,11 +1312,13 @@
                     const teacherData = teacherDoc.data();
                     console.log('User is a teacher:', teacherData);
                     
-                    document.getElementById('teacherWelcome').textContent = `Welcome, ${teacherData.firstName} ${teacherData.lastName}`;
+                    document.getElementById('teacherWelcome').textContent = `Welcome, ${teacherData.displayName}`;
+                    
+                    // Update header profile picture
+                    updateTeacherHeaderProfile(teacherData);
                     
                     // Reset button loading state before switching
-                    setButtonLoading('teacherLoginBtn', false);
-                    setButtonLoading('teacherSignupBtn', false);
+                    setButtonLoading('teacherGoogleSignIn', false);
                     
                     // Show teacher dashboard
                     console.log('Showing teacher dashboard...');
@@ -1127,16 +1327,24 @@
                     return;
                 }
 
-                // If neither role found
-                console.log('User role not found, signing out');
-                await window.firebaseAuth.signOut(window.auth);
-                showAlert('User role not found. Please contact administrator or create an account.');
+                // If no existing teacher profile, show profile setup
+                console.log('New teacher, showing profile setup...');
+                showTeacherProfileSetup();
                 
             } catch (error) {
                 console.error('Error checking user role:', error);
                 showAlert('Error checking user permissions: ' + error.message);
-                setButtonLoading('teacherLoginBtn', false);
-                setButtonLoading('teacherSignupBtn', false);
+                setButtonLoading('teacherGoogleSignIn', false);
+            }
+        }
+
+        // Update teacher header profile
+        function updateTeacherHeaderProfile(teacherData) {
+            const headerProfilePic = document.getElementById('teacherHeaderProfilePic');
+            if (teacherData.profilePicture) {
+                headerProfilePic.innerHTML = `<img src="${teacherData.profilePicture}" alt="${teacherData.displayName}" class="profile-picture">`;
+            } else {
+                headerProfilePic.innerHTML = getInitials(teacherData.displayName);
             }
         }
 
@@ -1147,6 +1355,7 @@
             document.getElementById('adminPortal').classList.add('hidden');
             document.getElementById('teacherDashboard').classList.add('hidden');
             document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('teacherProfileModal').classList.add('hidden');
         }
 
         function showTeacherPortal() {
@@ -1159,22 +1368,13 @@
             document.getElementById('adminPortal').classList.remove('hidden');
         }
 
-        function showTeacherLogin() {
-            document.getElementById('teacherLogin').classList.remove('hidden');
-            document.getElementById('teacherSignup').classList.add('hidden');
-        }
-
-        function showTeacherSignup() {
-            document.getElementById('teacherLogin').classList.add('hidden');
-            document.getElementById('teacherSignup').classList.remove('hidden');
-        }
-
         function showTeacherDashboard() {
             console.log('Switching to teacher dashboard...');
             document.getElementById('teacherPortal').classList.add('hidden');
             document.getElementById('adminPortal').classList.add('hidden');
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('teacherProfileModal').classList.add('hidden');
             document.getElementById('teacherDashboard').classList.remove('hidden');
         }
 
@@ -1185,6 +1385,74 @@
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('teacherDashboard').classList.add('hidden');
             document.getElementById('adminDashboard').classList.remove('hidden');
+        }
+
+        function showTeacherProfileSetup() {
+            document.getElementById('teacherPortal').classList.add('hidden');
+            document.getElementById('teacherProfileModal').classList.remove('hidden');
+            
+            // Set default placeholder
+            const preview = document.getElementById('teacherProfilePicturePreview');
+            preview.textContent = getInitials(currentUser.displayName);
+        }
+
+        function showTeacherProfileModal() {
+            document.getElementById('teacherProfileViewModal').classList.remove('hidden');
+            loadTeacherProfileModal();
+        }
+
+        function hideTeacherProfileModal() {
+            document.getElementById('teacherProfileViewModal').classList.add('hidden');
+        }
+
+        // Load teacher profile modal
+        async function loadTeacherProfileModal() {
+            try {
+                const teacherDoc = await window.firestore.getDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid));
+                if (teacherDoc.exists()) {
+                    const teacherData = teacherDoc.data();
+                    
+                    // Update profile picture
+                    const profilePic = document.getElementById('teacherProfileModalPic');
+                    if (teacherData.profilePicture) {
+                        profilePic.innerHTML = `<img src="${teacherData.profilePicture}" alt="${teacherData.displayName}" class="profile-picture-large">`;
+                    } else {
+                        profilePic.innerHTML = getInitials(teacherData.displayName);
+                        profilePic.className = 'profile-placeholder-large mx-auto mb-4';
+                    }
+                    
+                    // Update profile info
+                    const profileInfo = document.getElementById('teacherProfileInfo');
+                    profileInfo.innerHTML = `
+                        <div class="flex justify-between">
+                            <span class="font-medium">Name:</span>
+                            <span>${teacherData.displayName}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium">Email:</span>
+                            <span class="text-xs">${teacherData.email}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium">Phone:</span>
+                            <span>${teacherData.phone || 'Not provided'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium">Department:</span>
+                            <span>${teacherData.department || 'Not specified'}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium">Subjects:</span>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                ${teacherData.subjects ? teacherData.subjects.map(subject => 
+                                    `<span class="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full">${subject}</span>`
+                                ).join('') : 'None specified'}
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading teacher profile:', error);
+            }
         }
 
         // Subject selection for teacher registration
@@ -1210,14 +1478,26 @@
             
             if (loading) {
                 button.disabled = true;
-                button.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                if (buttonId === 'teacherGoogleSignIn') {
+                    button.innerHTML = '<div class="loading-spinner"></div> Signing in...';
+                } else {
+                    button.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                }
             } else {
                 button.disabled = false;
                 // Reset button text based on button type
-                if (buttonId === 'teacherSignupBtn') {
-                    button.innerHTML = 'Create Account';
-                } else if (buttonId === 'teacherLoginBtn') {
-                    button.innerHTML = 'Login';
+                if (buttonId === 'teacherGoogleSignIn') {
+                    button.innerHTML = `
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Sign in with Google
+                    `;
+                } else if (buttonId === 'completeProfileBtn') {
+                    button.innerHTML = 'Complete Profile';
                 } else if (buttonId === 'adminLoginBtn') {
                     button.innerHTML = 'Access Admin Portal';
                 }
@@ -1225,66 +1505,89 @@
         }
 
         // Authentication functions
-        async function teacherSignup(event) {
-            event.preventDefault();
-            
+        async function teacherGoogleLogin() {
             if (!isFirebaseReady) {
                 showAlert('System is still initializing. Please wait a moment and try again.');
                 return;
             }
 
-            setButtonLoading('teacherSignupBtn', true);
-            
-            const firstName = document.getElementById('teacherFirstName').value;
-            const lastName = document.getElementById('teacherLastName').value;
-            const email = document.getElementById('signupTeacherEmail').value;
-            const phone = document.getElementById('teacherPhone').value;
-            const password = document.getElementById('signupTeacherPassword').value;
-            const confirmPassword = document.getElementById('confirmTeacherPassword').value;
+            setButtonLoading('teacherGoogleSignIn', true);
 
-            if (password !== confirmPassword) {
-                showAlert('Passwords do not match!');
-                setButtonLoading('teacherSignupBtn', false);
-                return;
+            try {
+                console.log('Attempting Google Sign-In...');
+                
+                const result = await window.firebaseAuth.signInWithPopup(window.auth, window.googleProvider);
+                const user = result.user;
+                
+                console.log('Google Sign-In successful:', user.displayName);
+                
+                // The auth state observer will handle the rest automatically
+                
+            } catch (error) {
+                console.error('Error with Google Sign-In:', error);
+                let errorMessage = 'Sign-in failed. ';
+                
+                switch (error.code) {
+                    case 'auth/popup-closed-by-user':
+                        errorMessage += 'Sign-in popup was closed.';
+                        break;
+                    case 'auth/popup-blocked':
+                        errorMessage += 'Sign-in popup was blocked by browser.';
+                        break;
+                    case 'auth/cancelled-popup-request':
+                        errorMessage += 'Sign-in was cancelled.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                showAlert(errorMessage);
+                setButtonLoading('teacherGoogleSignIn', false);
             }
+        }
+
+        async function completeTeacherProfile(event) {
+            event.preventDefault();
+            
+            setButtonLoading('completeProfileBtn', true);
+            
+            const phone = document.getElementById('teacherProfilePhone').value;
+            const department = document.getElementById('teacherDepartment').value;
 
             if (selectedSubjects.length === 0) {
                 showAlert('Please select at least one subject specialization.');
-                setButtonLoading('teacherSignupBtn', false);
+                setButtonLoading('completeProfileBtn', false);
                 return;
             }
 
             try {
-                console.log('Creating teacher account for:', email);
-                
-                // Create user account
-                const userCredential = await window.firebaseAuth.createUserWithEmailAndPassword(window.auth, email, password);
-                const user = userCredential.user;
-                console.log('User account created:', user.uid);
+                console.log('Completing teacher profile for:', currentUser.displayName);
 
                 // Save teacher data to Firestore
-                await window.firestore.setDoc(window.firestore.doc(window.db, 'teachers', user.uid), {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
+                await window.firestore.setDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid), {
+                    displayName: currentUser.displayName,
+                    email: currentUser.email,
                     phone: phone,
+                    department: department,
                     subjects: selectedSubjects,
+                    profilePicture: tempImageUrl || currentUser.photoURL || null,
                     createdAt: window.firestore.serverTimestamp(),
                     studentsAdded: 0,
                     reportsCreated: 0,
                     lastActive: window.firestore.serverTimestamp()
                 });
 
-                console.log('Teacher data saved to Firestore');
+                console.log('Teacher profile completed');
 
                 // Log activity
-                await logActivity(`New teacher registered: ${firstName} ${lastName}`, 'teacher_registration');
+                await logActivity(`New teacher profile completed: ${currentUser.displayName}`, 'teacher_registration');
 
-                showAlert('Teacher account created successfully! You will be logged in automatically.');
+                showAlert('Profile completed successfully! Welcome to Prince Emmanuel School Complex.');
                 
                 // Clear form data
                 selectedSubjects = [];
-                document.getElementById('teacherSignupForm').reset();
+                tempImageUrl = null;
+                document.getElementById('teacherProfileForm').reset();
                 
                 // Reset checkboxes
                 document.querySelectorAll('.subject-checkbox').forEach(cb => {
@@ -1292,72 +1595,15 @@
                     cb.querySelector('input').checked = false;
                 });
 
-                // The auth state observer will automatically handle the login
+                // Hide profile modal and show dashboard
+                document.getElementById('teacherProfileModal').classList.add('hidden');
+                showTeacherDashboard();
+                await loadTeacherData();
 
             } catch (error) {
-                console.error('Error creating teacher account:', error);
-                showAlert('Error creating account: ' + error.message);
-                setButtonLoading('teacherSignupBtn', false);
-            }
-        }
-
-        async function teacherLogin(event) {
-            event.preventDefault();
-            
-            if (!isFirebaseReady) {
-                showAlert('System is still initializing. Please wait a moment and try again.');
-                return;
-            }
-
-            setButtonLoading('teacherLoginBtn', true);
-            
-            const email = document.getElementById('teacherEmail').value.trim();
-            const password = document.getElementById('teacherPassword').value;
-
-            if (!email || !password) {
-                showAlert('Please enter both email and password.');
-                setButtonLoading('teacherLoginBtn', false);
-                return;
-            }
-
-            try {
-                console.log('Attempting teacher login for:', email);
-                
-                const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(window.auth, email, password);
-                console.log('Teacher login successful for:', userCredential.user.uid);
-                
-                // The auth state observer will handle the rest automatically
-                // Don't reset the button loading here - let the observer handle navigation
-                
-            } catch (error) {
-                console.error('Error signing in:', error);
-                let errorMessage = 'Login failed. ';
-                
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage += 'No account found with this email address.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage += 'Incorrect password.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage += 'Invalid email address.';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage += 'This account has been disabled.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage += 'Too many failed attempts. Please try again later.';
-                        break;
-                    case 'auth/invalid-credential':
-                        errorMessage += 'Invalid email or password.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                
-                showAlert(errorMessage);
-                setButtonLoading('teacherLoginBtn', false);
+                console.error('Error completing teacher profile:', error);
+                showAlert('Error completing profile: ' + error.message);
+                setButtonLoading('completeProfileBtn', false);
             }
         }
 
@@ -1376,7 +1622,7 @@
                     console.log('Admin access code correct');
                     
                     // Set up admin session without Firebase auth
-                    currentUser = { uid: 'admin-access', email: 'admin@pesco.com' };
+                    currentUser = { uid: 'admin-access', email: 'admin@pesco.com', displayName: 'Administrator' };
                     currentUserRole = 'admin';
                     
                     document.getElementById('adminWelcome').textContent = 'Welcome, Administrator';
@@ -1414,6 +1660,102 @@
             } catch (error) {
                 console.error('Error signing out:', error);
                 showAlert('Error signing out: ' + error.message);
+            }
+        }
+
+        // Image upload functions
+        function showImageUploadModal(target) {
+            currentImageTarget = target;
+            document.getElementById('imageUploadModal').classList.remove('hidden');
+            resetImageUpload();
+        }
+
+        function hideImageUploadModal() {
+            document.getElementById('imageUploadModal').classList.add('hidden');
+            currentImageTarget = null;
+            tempImageUrl = null;
+            resetImageUpload();
+        }
+
+        function resetImageUpload() {
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('imageUrlInput').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    showAlert('Image size should be less than 5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    showImagePreview(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleImageUrl() {
+            const url = document.getElementById('imageUrlInput').value.trim();
+            if (url) {
+                // Basic URL validation
+                try {
+                    new URL(url);
+                    showImagePreview(url);
+                } catch {
+                    showAlert('Please enter a valid image URL');
+                }
+            }
+        }
+
+        function showImagePreview(imageUrl) {
+            document.getElementById('imagePreview').src = imageUrl;
+            document.getElementById('imagePreviewContainer').classList.remove('hidden');
+            tempImageUrl = imageUrl;
+        }
+
+        function confirmImageSelection() {
+            if (!tempImageUrl) return;
+            
+            // Update the appropriate preview based on target
+            if (currentImageTarget === 'teacher') {
+                const preview = document.getElementById('teacherProfilePicturePreview');
+                preview.innerHTML = `<img src="${tempImageUrl}" alt="Teacher" class="profile-picture-large">`;
+            } else if (currentImageTarget === 'teacherProfile') {
+                updateTeacherProfilePicture(tempImageUrl);
+            } else if (currentImageTarget === 'student') {
+                const preview = document.getElementById('studentProfilePicturePreview');
+                preview.innerHTML = `<img src="${tempImageUrl}" alt="Student" class="profile-picture-large">`;
+            }
+            
+            hideImageUploadModal();
+        }
+
+        async function updateTeacherProfilePicture(imageUrl) {
+            try {
+                // Update in Firestore
+                await window.firestore.updateDoc(window.firestore.doc(window.db, 'teachers', currentUser.uid), {
+                    profilePicture: imageUrl,
+                    lastActive: window.firestore.serverTimestamp()
+                });
+
+                // Update UI
+                const profilePic = document.getElementById('teacherProfileModalPic');
+                profilePic.innerHTML = `<img src="${imageUrl}" alt="Teacher" class="profile-picture-large">`;
+                
+                // Update header
+                const headerPic = document.getElementById('teacherHeaderProfilePic');
+                headerPic.innerHTML = `<img src="${imageUrl}" alt="Teacher" class="profile-picture">`;
+
+                showAlert('Profile picture updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating profile picture:', error);
+                showAlert('Error updating profile picture: ' + error.message);
             }
         }
 
@@ -1482,6 +1824,7 @@
                 parentPhone: document.getElementById('parentPhone').value,
                 talent: document.getElementById('studentTalent').value,
                 address: document.getElementById('studentAddress').value,
+                profilePicture: tempImageUrl || null,
                 teacherId: currentUser.uid,
                 createdAt: window.firestore.serverTimestamp()
             };
@@ -1522,8 +1865,9 @@
                 loadTeacherStudents();
                 loadTeacherData();
                 
-                // Reset form
+                // Reset form and temp image
                 document.getElementById('addStudentForm').reset();
+                tempImageUrl = null;
                 generateStudentId();
 
             } catch (error) {
@@ -1543,11 +1887,15 @@
 
         function showAddStudentModal() {
             generateStudentId();
+            tempImageUrl = null;
+            document.getElementById('studentProfilePicturePreview').innerHTML = 'S';
+            document.getElementById('studentProfilePicturePreview').className = 'profile-placeholder-large mb-4';
             document.getElementById('addStudentModal').classList.remove('hidden');
         }
 
         function hideAddStudentModal() {
             document.getElementById('addStudentModal').classList.add('hidden');
+            tempImageUrl = null;
         }
 
         // Load teacher data
@@ -1627,7 +1975,7 @@
                 tbody.innerHTML = '';
 
                 if (studentsSnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No students found. Click "Add Student" to get started.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No students found. Click "Add Student" to get started.</td></tr>';
                     return;
                 }
 
@@ -1636,6 +1984,9 @@
                     const row = document.createElement('tr');
                     row.className = index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50';
                     row.innerHTML = `
+                        <td class="px-6 py-4">
+                            ${createProfilePicture(student.profilePicture, student.name)}
+                        </td>
                         <td class="px-6 py-4 font-semibold text-blue-600">${student.id}</td>
                         <td class="px-6 py-4 font-medium">${student.name}</td>
                         <td class="px-6 py-4">
@@ -2424,7 +2775,7 @@
                 tbody.innerHTML = '';
 
                 if (teachersSnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No teachers found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="px-6 py-8 text-center text-gray-500">No teachers found.</td></tr>';
                     return;
                 }
 
@@ -2433,14 +2784,24 @@
                     const row = document.createElement('tr');
                     row.className = index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50';
                     row.innerHTML = `
-                        <td class="px-6 py-4 font-medium">${teacher.firstName} ${teacher.lastName}</td>
-                        <td class="px-6 py-4">${teacher.email}</td>
+                        <td class="px-6 py-4">
+                            ${createProfilePicture(teacher.profilePicture, teacher.displayName)}
+                        </td>
+                        <td class="px-6 py-4 font-medium">${teacher.displayName}</td>
+                        <td class="px-6 py-4 text-sm">${teacher.email}</td>
                         <td class="px-6 py-4">${teacher.phone || 'N/A'}</td>
                         <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                ${teacher.department || 'N/A'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
                             <div class="flex flex-wrap gap-1">
-                                ${teacher.subjects ? teacher.subjects.map(subject => 
+                                ${teacher.subjects ? teacher.subjects.slice(0, 2).map(subject => 
                                     `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">${subject}</span>`
                                 ).join('') : 'N/A'}
+                                ${teacher.subjects && teacher.subjects.length > 2 ? 
+                                    `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">+${teacher.subjects.length - 2}</span>` : ''}
                             </div>
                         </td>
                         <td class="px-6 py-4 text-center">${teacher.studentsAdded || 0}</td>
@@ -2470,7 +2831,7 @@
                 tbody.innerHTML = '';
 
                 if (studentsSnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>';
                     return;
                 }
 
@@ -2479,7 +2840,7 @@
                 const teacherNames = {};
                 teachersSnapshot.forEach(doc => {
                     const teacher = doc.data();
-                    teacherNames[doc.id] = `${teacher.firstName} ${teacher.lastName}`;
+                    teacherNames[doc.id] = teacher.displayName;
                 });
 
                 studentsSnapshot.forEach((doc, index) => {
@@ -2487,6 +2848,9 @@
                     const row = document.createElement('tr');
                     row.className = index % 2 === 0 ? 'bg-white hover:bg-green-50' : 'bg-gray-50 hover:bg-green-50';
                     row.innerHTML = `
+                        <td class="px-6 py-4">
+                            ${createProfilePicture(student.profilePicture, student.name)}
+                        </td>
                         <td class="px-6 py-4 font-semibold text-green-600">${student.id}</td>
                         <td class="px-6 py-4 font-medium">${student.name}</td>
                         <td class="px-6 py-4">
@@ -2588,10 +2952,10 @@
                     const teacher = doc.data();
                     teachersData.push({
                         'Teacher ID': doc.id,
-                        'First Name': teacher.firstName,
-                        'Last Name': teacher.lastName,
+                        'Name': teacher.displayName,
                         'Email': teacher.email,
                         'Phone': teacher.phone,
+                        'Department': teacher.department || '',
                         'Subjects': teacher.subjects ? teacher.subjects.join(', ') : '',
                         'Students Added': teacher.studentsAdded || 0,
                         'Reports Created': teacher.reportsCreated || 0,
@@ -2622,7 +2986,7 @@
                 const teacherNames = {};
                 teachersSnapshot.forEach(doc => {
                     const teacher = doc.data();
-                    teacherNames[doc.id] = `${teacher.firstName} ${teacher.lastName}`;
+                    teacherNames[doc.id] = teacher.displayName;
                 });
 
                 const studentsData = [];
