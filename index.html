@@ -1200,6 +1200,7 @@
         let isFirebaseReady = false;
         let currentImageTarget = null;
         let tempImageUrl = null;
+        let isCheckingRole = false;
 
         // Wait for Firebase to be ready
         window.addEventListener('firebaseReady', () => {
@@ -1298,43 +1299,49 @@
 
         // Check user role in Firestore
         async function checkUserRole() {
-            if (!currentUser) return;
+            if (!currentUser || isCheckingRole) return;
+
+            isCheckingRole = true;
 
             try {
                 console.log('Checking user role for:', currentUser.email);
-                
+
                 // Check if user is a teacher
                 const teacherDocRef = window.firestore.doc(window.db, 'teachers', currentUser.uid);
                 const teacherDoc = await window.firestore.getDoc(teacherDocRef);
-                
+
                 if (teacherDoc.exists()) {
                     currentUserRole = 'teacher';
                     const teacherData = teacherDoc.data();
                     console.log('User is a teacher:', teacherData);
-                    
+
                     document.getElementById('teacherWelcome').textContent = `Welcome, ${teacherData.displayName}`;
-                    
+
                     // Update header profile picture
                     updateTeacherHeaderProfile(teacherData);
-                    
+
                     // Reset button loading state before switching
                     setButtonLoading('teacherGoogleSignIn', false);
-                    
+
                     // Show teacher dashboard
                     console.log('Showing teacher dashboard...');
                     showTeacherDashboard();
                     await loadTeacherData();
+                    isCheckingRole = false;
                     return;
                 }
 
                 // If no existing teacher profile, show profile setup
                 console.log('New teacher, showing profile setup...');
+                setButtonLoading('teacherGoogleSignIn', false);
                 showTeacherProfileSetup();
-                
+                isCheckingRole = false;
+
             } catch (error) {
                 console.error('Error checking user role:', error);
                 showAlert('Error checking user permissions: ' + error.message);
                 setButtonLoading('teacherGoogleSignIn', false);
+                isCheckingRole = false;
             }
         }
 
@@ -1579,21 +1586,41 @@
 
                 console.log('Teacher profile completed');
 
+                // Update role and UI immediately
+                currentUserRole = 'teacher';
+                isCheckingRole = false;
+
+                const teacherData = {
+                    displayName: currentUser.displayName,
+                    email: currentUser.email,
+                    phone: phone,
+                    department: department,
+                    subjects: selectedSubjects,
+                    profilePicture: tempImageUrl || currentUser.photoURL || null,
+                    studentsAdded: 0,
+                    reportsCreated: 0
+                };
+
+                document.getElementById('teacherWelcome').textContent = `Welcome, ${teacherData.displayName}`;
+                updateTeacherHeaderProfile(teacherData);
+
                 // Log activity
                 await logActivity(`New teacher profile completed: ${currentUser.displayName}`, 'teacher_registration');
 
                 showAlert('Profile completed successfully! Welcome to Prince Emmanuel School Complex.');
-                
+
                 // Clear form data
                 selectedSubjects = [];
                 tempImageUrl = null;
                 document.getElementById('teacherProfileForm').reset();
-                
+
                 // Reset checkboxes
                 document.querySelectorAll('.subject-checkbox').forEach(cb => {
                     cb.classList.remove('selected');
                     cb.querySelector('input').checked = false;
                 });
+
+                setButtonLoading('completeProfileBtn', false);
 
                 // Hide profile modal and show dashboard
                 document.getElementById('teacherProfileModal').classList.add('hidden');
@@ -1649,14 +1676,15 @@
                 if (currentUser && currentUser.uid !== 'admin-access') {
                     await window.firebaseAuth.signOut(window.auth);
                 }
-                
+
                 // Clear current user data
                 currentUser = null;
                 currentUserRole = null;
-                
+                isCheckingRole = false;
+
                 goHome();
                 showAlert('Logged out successfully');
-                
+
             } catch (error) {
                 console.error('Error signing out:', error);
                 showAlert('Error signing out: ' + error.message);
